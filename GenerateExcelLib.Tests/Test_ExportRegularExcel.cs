@@ -2,13 +2,14 @@ using Xunit;
 using System;
 using System.IO;
 using System.Data;
+using System.Collections.Generic;
 using GenerateExcelLib;
 using Aspose.Cells;
 
 namespace GenerateExcelLib.Tests
 {
 
-    public class Test_ExportExcel
+    public class Test_ExportExcel:IDisposable
     {
         private DataTable Initial_Simple_DataTable()
         {
@@ -24,7 +25,13 @@ namespace GenerateExcelLib.Tests
             return mydata;
 
         }
+        public void Dispose()
+        {
+            // release resource if you use them during test.
+        }
+
         [Fact]
+        [Trait("Category","Basic")]
         public void Export_CorrectColumns_withHead()
         {
             //Arrange: generate datatable
@@ -48,6 +55,7 @@ namespace GenerateExcelLib.Tests
             }
         }
         [Fact]
+        [Trait("Category","Basic")]
         public void Export_CorrectColumns_withNoHead()
         {
             //generate datatable
@@ -73,6 +81,7 @@ namespace GenerateExcelLib.Tests
             
         }
         [Fact]
+        [Trait("Category","Basic")]
         public void Export_CorrectColumns_withNoHead_start_RowNum()
         {
             //generate datatable
@@ -99,6 +108,7 @@ namespace GenerateExcelLib.Tests
         }
 
         [Fact]
+        [Trait("Category","Basic")]
         public void Export_CorrectContent_withHead()
         {
             //generate datatable
@@ -123,6 +133,7 @@ namespace GenerateExcelLib.Tests
             
         }    
         [Fact]
+        [Trait("Category","Basic")]
         public void Export_CorrectContent_withNoHead()
         {
 
@@ -148,7 +159,8 @@ namespace GenerateExcelLib.Tests
             
         }           
         [Fact]
-        public void Export_MergeCell()
+        [Trait("Category","Basic")]
+        public void Export_MergeCell_Multi_Rows()
         {
             //generate datatable
             using(DataTable mydata=Initial_Simple_DataTable())
@@ -171,8 +183,36 @@ namespace GenerateExcelLib.Tests
                 }
             }
             
+        }   
+
+        [Fact]
+        [Trait("Category","Basic")]
+        public void Export_MergeCell_Multi_Cols()
+        {
+            //generate datatable
+            using(DataTable mydata=Initial_Simple_DataTable())
+            {
+                var work_book=new ExportRegularExcel();
+                var merge_Book= work_book.GenerateExcel(mydata);
+                //run test function
+                using( Workbook mergedBook= work_book.MergeCell(merge_Book,1,3,2,1))
+                {
+                    using(MemoryStream ms=new MemoryStream(new byte[5000000]))
+                    {
+                        //save excel file content into tempfile(memory stream)
+                        mergedBook.Save(ms,SaveFormat.Xlsx);
+                       // mergedBook.Save(@"c:\test.xlsx"); // only for debug
+                        //Assert result
+                        var result=Excel_Ops_Aspose.Is_MergeCell(ms,1,3,2,1);
+                        Assert.True(result); //assert the spicified area is merged.
+
+                    }
+                }
+            }
+            
         }    
         [Fact]
+        [Trait("Category","Basic")]
         public void Export_MergeCell_withArgumentException()
         {
             var work_book=new ExportRegularExcel();
@@ -183,6 +223,7 @@ namespace GenerateExcelLib.Tests
 
         }      
         [Fact]
+        [Trait("Category","Basic")]
         public void Export_MergeCell_withNullObjectException()
         {
             var work_book=new ExportRegularExcel();
@@ -193,7 +234,18 @@ namespace GenerateExcelLib.Tests
 
 
         }
-        
+        [Fact(Skip="demo skip")]
+        public void Export_MergeCell_demoSkip()
+        {
+            var work_book=new ExportRegularExcel();
+            
+
+            //run test function
+            var exception= Assert.Throws<NullReferenceException>(()=> work_book.MergeCell(null,1,1,1,2));
+
+
+        }
         
     }
+
 }
