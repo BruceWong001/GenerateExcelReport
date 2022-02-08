@@ -18,14 +18,15 @@ namespace GenerateExcelLib.Tests
     {
         public DateTime Session{get;set;}
     }
-    class SimpleClass
-    {
-        public string ClassTitle{get;set;}
-        public string ClassCode{get;set;}
-        public string Trainer {get;set;}
-    }
+
     public class Test_ExportDataDesigner
     {
+        class SimpleClass
+        {
+            public string ClassTitle{get;set;}
+            public string ClassCode{get;set;}
+            public string Trainer {get;set;}
+        }
         [Fact]
         [Trait("Category","ExportData Designer")]
         public void GenerateDataTable_SimpleObj()
@@ -40,8 +41,30 @@ namespace GenerateExcelLib.Tests
             Assert.Equal(3,table.Columns.Count);
             Assert.Equal("Bill",table.Rows[0][2].ToString());
             
+        } 
+        class SimpleClassEx
+        {
+            public string ClassTitle{get;set;}
+            public string ClassCode{get;set;}
+            public Learner Student{get;set;}
+            public string Trainer {get;set;}
+            public DateTime RegistryTime{get;set;}
         }
- 
+        [Fact]
+        [Trait("Category","ExportData Designer")]
+        public void GenerateDataTable_SimpleObj_WithObjMember()
+        {
+            // Given
+            SimpleClassEx data=new SimpleClassEx(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",Student=new Learner{Name="Bruce",Age=30},RegistryTime=DateTime.Now};
+            // When
+            var designer=new ExportDataDesigner<SimpleClassEx>(data);
+            DataTable table=designer.GeneratDataTable();
+            // Then
+            Assert.Equal(1,table.Rows.Count);
+            Assert.Equal(6,table.Columns.Count);
+            Assert.Equal("Bill",table.Rows[0][4].ToString());
+            
+        }         
         class ListStart
         {
             public List<SessionTime> Sessions {get;set;}
@@ -109,7 +132,7 @@ namespace GenerateExcelLib.Tests
         }
         class SessionObj
         {
-            public List<SessionTime> Sessions {get;set;}
+            public DateTime Session {get;set;}
             public List<Learner> Learners {get;set;}
         }
         class ComprehensiveObj
@@ -119,27 +142,24 @@ namespace GenerateExcelLib.Tests
             public string Trainer {get;set;}
             public List<SessionObj> SessionList{get;set;}
             
-            
         }
-        [Fact(Skip="not finished")]
+        [Fact(Skip="not finish yet")]
         [Trait("Category","ExportData Designer")]
         public void GenerateDataTable_DynamicRows_Validate_ColRow_Num()
         {
             // Given
             ComprehensiveObj data=new ComprehensiveObj(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
                        
-                       SessionList=new List<SessionObj>{new SessionObj{Sessions=new List<SessionTime>{new SessionTime{Session=DateTime.Now},new SessionTime{Session=DateTime.Now.AddDays(1)},new SessionTime{Session=DateTime.Now.AddDays(2)}},
-                        Learners=new List<Learner>{new Learner{Name="Bruce",Age=30}}},
-                        new SessionObj{Sessions=new List<SessionTime>{new SessionTime{Session=DateTime.Now.AddHours(1)},new SessionTime{Session=DateTime.Now.AddHours(2).AddDays(1)},new SessionTime{Session=DateTime.Now.AddDays(2)}},
-                        Learners=new List<Learner>{new Learner{Name="Bruce",Age=30},new Learner{Name="Lily",Age=20}}}}                            
+                       SessionList=new List<SessionObj>{new SessionObj{Session=DateTime.Now,Learners=new List<Learner>{new Learner{Name="Bruce",Age=30},new Learner{Name="Lily",Age=20}}},
+                                            new SessionObj{Session=DateTime.Now.AddDays(1),Learners=new List<Learner>{new Learner{Name="Bruce",Age=30}}}}                            
                         
                        };
             // When
             var designer=new ExportDataDesigner<ComprehensiveObj>(data);
             DataTable table=designer.GeneratDataTable();
             // Then
-            Assert.Equal(6,table.Rows.Count);
-            Assert.Equal(4,table.Columns.Count);
+            Assert.Equal(3,table.Rows.Count);
+            Assert.Equal(6,table.Columns.Count);
 
         }
 

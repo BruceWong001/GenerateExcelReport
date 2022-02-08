@@ -50,15 +50,14 @@ namespace GenerateExcelLib
             {                
                 var propertyName = property_Item.Name;
                 var IsGenericType = property_Item.PropertyType.IsGenericType;
+                var IsBasicType= property_Item.PropertyType.IsPrimitive || property_Item.PropertyType.Equals(typeof(String)) || property_Item.PropertyType.Equals(typeof(string)) || 
+                                    property_Item.PropertyType.Equals(typeof(DateTime));
                 var list = property_Item.PropertyType.GetInterface("IEnumerable", false); //retrieve the collection object.
                 if (IsGenericType && list != null)
                 {
                     // if current property is  a list type.
                     var listVal = property_Item.GetValue(_data) as IEnumerable<object>;
-                    if (listVal == null) 
-                    {
-                        continue;
-                    }
+                    if (listVal == null) continue;
                     int start_Col=currentCol; // record the column index for the looping of List items
                     Boolean isFirstTime_inLoop=needAddCol;
                     foreach (var item in listVal)
@@ -70,6 +69,11 @@ namespace GenerateExcelLib
                         DrillDown(item,start_Col,isFirstTime_inLoop,isFirstTime_inLoop?row:null);
                         isFirstTime_inLoop=false;
                     }
+                }
+                else if(!IsBasicType)
+                {// if curren property is data object, it should keep drilling down.
+                    currentCol= DrillDown(property_Item.GetValue(_data),currentCol,true,row);
+                    continue; //since layout all properties from your customized Class, so no need plus column index again.  
                 }
                 else
                 {
