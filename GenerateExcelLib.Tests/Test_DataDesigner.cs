@@ -9,24 +9,16 @@ using Aspose.Cells;
 
 namespace GenerateExcelLib.Tests
 {
-    public class Learner
+    class Learner
     {
         public string Name{get;set;}
         public int Age {get;set;}
     }
-    public class SessionTime
+    class SessionTime
     {
         public DateTime Session{get;set;}
     }
-    public class MyClass
-    {
-        public string ClassTitle{get;set;}
-        public string ClassCode{get;set;}
-        public List<DateTime> Sessions {get;set;}
-        public string Trainer {get;set;}
-        public List<Learner> learners {get;set;}
-    }
-    public class SimpleClass
+    class SimpleClass
     {
         public string ClassTitle{get;set;}
         public string ClassCode{get;set;}
@@ -50,7 +42,7 @@ namespace GenerateExcelLib.Tests
             
         }
  
-        public class ListStart
+        class ListStart
         {
             public List<SessionTime> Sessions {get;set;}
             public string ClassTitle{get;set;}
@@ -69,9 +61,8 @@ namespace GenerateExcelLib.Tests
             // Then
             Assert.Equal(2,table.Rows.Count);
             Assert.Equal(3,table.Columns.Count);
-            Assert.Equal("Java",table.Rows[0][1].ToString());
         }
-        public class ListEnd
+        class ListEnd
         {   
             public string ClassTitle{get;set;}
             public string ClassCode{get;set;}
@@ -91,7 +82,65 @@ namespace GenerateExcelLib.Tests
             // Then
             Assert.Equal(3,table.Rows.Count);
             Assert.Equal(5,table.Columns.Count);
-            Assert.Equal("10010",table.Rows[0][1].ToString());
+
+        }
+        class ListMiddle
+        {   
+            public string ClassTitle{get;set;}
+            public string ClassCode{get;set;}            
+            public List<SessionTime> Sessions {get;set;}
+            public string Trainer {get;set;}
+            
+        }
+        [Fact]
+        [Trait("Category","ExportData Designer")]
+        public void GenerateDataTable_DynamicRows_AtMiddle()
+        {
+            // Given
+            ListMiddle data=new ListMiddle(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
+                       Sessions= new List<SessionTime>{new SessionTime{Session=DateTime.Now},new SessionTime{Session=DateTime.Now.AddDays(1)},new SessionTime{Session=DateTime.Now.AddDays(2)}}};
+            // When
+            var designer=new ExportDataDesigner<ListMiddle>(data);
+            DataTable table=designer.GeneratDataTable();
+            // Then
+            Assert.Equal(3,table.Rows.Count);
+            Assert.Equal(4,table.Columns.Count);
+
+        }
+        class SessionObj
+        {
+            public List<SessionTime> Sessions {get;set;}
+            public List<Learner> Learners {get;set;}
+        }
+        class ComprehensiveObj
+        {   
+            public string ClassTitle{get;set;}
+            public string ClassCode{get;set;}            
+            public string Trainer {get;set;}
+            public List<SessionObj> SessionList{get;set;}
+            
+            
+        }
+        [Fact(Skip="not finished")]
+        [Trait("Category","ExportData Designer")]
+        public void GenerateDataTable_DynamicRows_Validate_ColRow_Num()
+        {
+            // Given
+            ComprehensiveObj data=new ComprehensiveObj(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
+                       
+                       SessionList=new List<SessionObj>{new SessionObj{Sessions=new List<SessionTime>{new SessionTime{Session=DateTime.Now},new SessionTime{Session=DateTime.Now.AddDays(1)},new SessionTime{Session=DateTime.Now.AddDays(2)}},
+                        Learners=new List<Learner>{new Learner{Name="Bruce",Age=30}}},
+                        new SessionObj{Sessions=new List<SessionTime>{new SessionTime{Session=DateTime.Now.AddHours(1)},new SessionTime{Session=DateTime.Now.AddHours(2).AddDays(1)},new SessionTime{Session=DateTime.Now.AddDays(2)}},
+                        Learners=new List<Learner>{new Learner{Name="Bruce",Age=30},new Learner{Name="Lily",Age=20}}}}                            
+                        
+                       };
+            // When
+            var designer=new ExportDataDesigner<ComprehensiveObj>(data);
+            DataTable table=designer.GeneratDataTable();
+            // Then
+            Assert.Equal(6,table.Rows.Count);
+            Assert.Equal(4,table.Columns.Count);
+
         }
 
     }
