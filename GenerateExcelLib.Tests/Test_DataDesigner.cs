@@ -9,7 +9,7 @@ using Aspose.Cells;
 
 namespace GenerateExcelLib.Tests
 {
-    class Learner
+    public class Learner
     {
         public string Name{get;set;}
         public int Age {get;set;}
@@ -85,6 +85,22 @@ namespace GenerateExcelLib.Tests
             Assert.Equal(2,table.Rows.Count);
             Assert.Equal(3,table.Columns.Count);
         }
+        [Fact]
+        [Trait("Category","ExportData Designer")]
+        public void ValidateCellValue_DynamicRows_AtBegin()
+        {
+            // Given
+            ListStart data=new ListStart(){Sessions=new List<SessionTime>(){new SessionTime{Session=DateTime.Now},new SessionTime{Session=DateTime.Now.AddDays(1)}},
+                                     ClassTitle="Java",ClassCode="10010"};
+            // When
+            var designer=new ExportDataDesigner<ListStart>(data);
+            DataTable table=designer.GeneratDataTable();
+            // Then
+            Assert.Equal("10010",table.Rows[0][2].ToString());
+            Assert.Equal("10010",table.Rows[1][2].ToString());
+            Assert.Equal("Java",table.Rows[0][1].ToString());
+            Assert.Equal("Java",table.Rows[1][1].ToString());
+        }        
         class ListEnd
         {   
             public string ClassTitle{get;set;}
@@ -107,6 +123,25 @@ namespace GenerateExcelLib.Tests
             Assert.Equal(5,table.Columns.Count);
 
         }
+        [Fact]
+        [Trait("Category","ExportData Designer")]
+        public void ValidateCellValue_DynamicRows_AtEnd()
+        {
+            // Given
+            ListEnd data=new ListEnd(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
+                       learners= new List<Learner>{new Learner{Name="Lily",Age=20},new Learner{Name="Joe",Age=19},new Learner{Name="Wuli",Age=28}}};
+            // When
+            var designer=new ExportDataDesigner<ListEnd>(data);
+            DataTable table=designer.GeneratDataTable();
+            // Then
+            Assert.Equal("10010",table.Rows[1][1].ToString());
+            Assert.Equal("10010",table.Rows[2][1].ToString());
+            Assert.Equal("Java",table.Rows[1][0].ToString());
+            Assert.Equal("Java",table.Rows[2][0].ToString());
+            Assert.Equal("Bill",table.Rows[1][2].ToString());
+            Assert.Equal("Bill",table.Rows[2][2].ToString());
+
+        }    
         class ListMiddle
         {   
             public string ClassTitle{get;set;}
@@ -130,6 +165,25 @@ namespace GenerateExcelLib.Tests
             Assert.Equal(4,table.Columns.Count);
 
         }
+        [Fact]
+        [Trait("Category","ExportData Designer")]
+        public void ValidateCellValue_DynamicRows_AtMiddle()
+        {
+            // Given
+            ListMiddle data=new ListMiddle(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
+                       Sessions= new List<SessionTime>{new SessionTime{Session=DateTime.Now},new SessionTime{Session=DateTime.Now.AddDays(1)},new SessionTime{Session=DateTime.Now.AddDays(2)}}};
+            // When
+            var designer=new ExportDataDesigner<ListMiddle>(data);
+            DataTable table=designer.GeneratDataTable();
+            // Then
+            Assert.Equal("10010",table.Rows[1][1].ToString());
+            Assert.Equal("10010",table.Rows[2][1].ToString());
+            Assert.Equal("Java",table.Rows[1][0].ToString());
+            Assert.Equal("Java",table.Rows[2][0].ToString());
+            Assert.Equal("Bill",table.Rows[1][3].ToString());
+            Assert.Equal("Bill",table.Rows[2][3].ToString());
+
+        }  
         class SessionObj
         {
             public DateTime Session {get;set;}
@@ -162,6 +216,35 @@ namespace GenerateExcelLib.Tests
             Assert.Equal(6,table.Columns.Count);
 
         }
+        [Fact]
+        [Trait("Category","ExportData Designer")]
+        public void ValidateCellValue_DynamicRows_ComprehensiveObj()
+        {
+            // Given
+            ComprehensiveObj data=new ComprehensiveObj(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
+                       
+                       SessionList=new List<SessionObj>{new SessionObj{Session=DateTime.Now,Learners=new List<Learner>{new Learner{Name="Bruce",Age=30},new Learner{Name="Lily",Age=20}}},
+                                            new SessionObj{Session=DateTime.Now.AddDays(1),Learners=new List<Learner>{new Learner{Name="Leo",Age=35}}}}                            
+                        
+                       };         
+            // When
+            var designer=new ExportDataDesigner<ComprehensiveObj>(data);
+            DataTable table=designer.GeneratDataTable();
+            // Then
+            Assert.Equal("10010",table.Rows[1][1].ToString());
+            Assert.Equal("10010",table.Rows[2][1].ToString());
+            Assert.Equal("Java",table.Rows[1][0].ToString());
+            Assert.Equal("Java",table.Rows[2][0].ToString());
+            Assert.Equal("Bill",table.Rows[1][2].ToString());
+            Assert.Equal("Bill",table.Rows[2][2].ToString());
+            Assert.Equal("Bruce",table.Rows[0][4].ToString());
+            Assert.Equal(30,table.Rows[0][5]);
+            Assert.Equal("Lily",table.Rows[1][4].ToString());            
+            Assert.Equal(20,table.Rows[1][5]);
+            Assert.Equal("Leo",table.Rows[2][4].ToString());
+            Assert.Equal(35,table.Rows[2][5]);
+
+        }  
 
     }
 }

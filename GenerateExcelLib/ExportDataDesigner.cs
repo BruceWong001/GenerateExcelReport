@@ -33,14 +33,18 @@ namespace GenerateExcelLib
         ///
         /// recursion method. list all sub collection into one row.
         ///
-        private int DrillDown(Object _data,int currentCol,Boolean needAddCol=true,DataRow reuse_Row=null)
+        private int DrillDown(Object _data,int currentCol,int currentRowIndex=0,Boolean needAddCol=true,DataRow reuse_Row=null)
         {
             DataRow row;
+            int currentRowNum=currentRowIndex; //record current row number for copy data method.
             if(reuse_Row is null)
             {
                 //create a new row in datatable.
                 row=m_DT.NewRow();
+                DataRow previousRow=m_DT.Rows.Count>0?m_DT.Rows[m_DT.Rows.Count-1]:null;
                 m_DT.Rows.Add(row); 
+                currentRowNum=m_DT.Rows.Count-1;
+                CopyRowValuefromAboveRow(row,previousRow); 
             }
             else{
                 row=reuse_Row;
@@ -62,19 +66,18 @@ namespace GenerateExcelLib
                     Boolean isFirstTime_inLoop=needAddCol; //indicate if below loop needs to add new columns.
                     Boolean isResueRow_Forbelowloop=true; //indicate below loop if it needs to add a new row or reuse existing one.
                     foreach (var item in listVal)
-                    {
-                        /*
+                    {   /*
                          (isFirstTime_inLoop?row:null) this condition means it's firs time to drill down the first item in one list,
                          but you must reuse DataRow object, since you have already create this row on top.
                         */ 
-                        DrillDown(item,start_Col,isFirstTime_inLoop,isResueRow_Forbelowloop?row:null);
+                        DrillDown(item,start_Col,currentRowNum,isFirstTime_inLoop,isResueRow_Forbelowloop?row:null);
                         isFirstTime_inLoop=false;
                         isResueRow_Forbelowloop=false;
                     }
                 }
                 else if(!IsBasicType)
                 {// if curren property is data object, it should keep drilling down.
-                    currentCol= DrillDown(property_Item.GetValue(_data),currentCol,true,row);
+                    currentCol= DrillDown(property_Item.GetValue(_data),currentCol,currentRowNum,true,row);
                     continue; //since layout all properties from your customized Class, so no need plus column index again.  
                 }
                 else
@@ -86,15 +89,47 @@ namespace GenerateExcelLib
                     
                     var Value=property_Item.GetValue(_data); // add row value
                     row[currentCol]= Value;
+                    CopyValuetoBelowRows(currentCol,currentRowNum,Value);//copy new column's value to all above rows.
                 }
                 currentCol++;
             }
             return currentCol; //return the next column index number.
         }
+        ///
+        /// only copy the latest row's data to curren row.
+        ///
+        private void CopyRowValuefromAboveRow(DataRow newRow,DataRow oldRow)
+        {
+            int rowCount=m_DT.Rows.Count;
+            if(rowCount>1 && oldRow is not null)
+            {
+                //only handle there is existing data.
+                for(int colIndex=0;colIndex<m_DT.Columns.Count;colIndex++)
+                {
+                    newRow[colIndex]=oldRow[colIndex];
+                }
+                
+            }
+        }
+        ///
+        ///only copy current cell value to all above rows
+        ///
+        private void CopyValuetoBelowRows(int colIndex,int rowIndex,object value)
+        {
+            int currentRow=rowIndex;
+            if(m_DT.Rows.Count>1 && currentRow<m_DT.Rows.Count-1)
+            {
+                for(int rowNum=currentRow+1;rowNum<m_DT.Rows.Count;rowNum++)
+                {
+                    m_DT.Rows[rowNum][colIndex]=value;
+                }
+            }
+            
+        }
         public DataTable GeneratDataTable()
         {
             //
-            DrillDown(Data,0);
+            DrillDown(Data,0,0);
             return m_DT;
 
         }
