@@ -37,27 +37,29 @@ namespace GenerateExcelLib.Tests
                         
                        };         
 
-            var designer=new ExportDataDesigner<ComprehensiveObj>(data);
-            
-            //generate datatable
-            using(DataTable mydata=designer.GeneratDataTable())
+            using(var designer=new ExportDataDesigner<ComprehensiveObj>(data))
             {
-                var work_book=new ExportRegularExcel();
-                // When run test function
-                var Result_Book= work_book.GenerateExcel(mydata);
- 
-                using(MemoryStream ms=new MemoryStream(new byte[5000000]))
+            
+                //generate datatable
+                using(DataTable mydata=designer.GeneratDataTable())
                 {
-                    //save excel file content into tempfile(memory stream)
-                    Result_Book.Save(ms,SaveFormat.Xlsx);
-                   // Result_Book.Save(@"c:\test.xlsx"); // only for debug
-                    //Then Assert result
-                    var result=Excel_Ops_Aspose.Retrieve_Num_Column_Row(ms);
-                    Assert.Equal(6,result.Item1); //assert column num
-                    Assert.Equal(4,result.Item2); //assert row num
+                    var work_book=new ExportRegularExcel();
+                    // When run test function
+                    var Result_Book= work_book.GenerateExcel(mydata);
+    
+                    using(MemoryStream ms=new MemoryStream(new byte[5000000]))
+                    {
+                        //save excel file content into tempfile(memory stream)
+                        Result_Book.Save(ms,SaveFormat.Xlsx);
+                    // Result_Book.Save(@"c:\test.xlsx"); // only for debug
+                        //Then Assert result
+                        var result=Excel_Ops_Aspose.Retrieve_Num_Column_Row(ms);
+                        Assert.Equal(6,result.Item1); //assert column num
+                        Assert.Equal(4,result.Item2); //assert row num
 
-                    }
-                
+                        }
+                    
+                }
             }
             
         } 
@@ -73,27 +75,29 @@ namespace GenerateExcelLib.Tests
                         
                        };         
 
-            var designer=new ExportDataDesigner<ComprehensiveObj>(data);
-            
-            //generate datatable
-            using(DataTable mydata=designer.GeneratDataTable())
+            using(var designer=new ExportDataDesigner<ComprehensiveObj>(data))
             {
-                var work_book=new ExportRegularExcel();
-                // When run test function
-                var Result_Book= work_book.GenerateExcel(mydata,5,false);
- 
-                using(MemoryStream ms=new MemoryStream(new byte[5000000]))
+            
+                //generate datatable
+                using(DataTable mydata=designer.GeneratDataTable())
                 {
-                    //save excel file content into tempfile(memory stream)
-                    Result_Book.Save(ms,SaveFormat.Xlsx);
-                   // Result_Book.Save(@"c:\test.xlsx"); // only for debug
-                    //Then Assert result
-                    var result=Excel_Ops_Aspose.Retrieve_Num_Column_Row(ms);
-                    Assert.Equal(6,result.Item1); //assert column num
-                    Assert.Equal(7,result.Item2); //assert row num
+                    var work_book=new ExportRegularExcel();
+                    // When run test function
+                    var Result_Book= work_book.GenerateExcel(mydata,5,false);
+    
+                    using(MemoryStream ms=new MemoryStream(new byte[5000000]))
+                    {
+                        //save excel file content into tempfile(memory stream)
+                        Result_Book.Save(ms,SaveFormat.Xlsx);
+                    // Result_Book.Save(@"c:\test.xlsx"); // only for debug
+                        //Then Assert result
+                        var result=Excel_Ops_Aspose.Retrieve_Num_Column_Row(ms);
+                        Assert.Equal(6,result.Item1); //assert column num
+                        Assert.Equal(7,result.Item2); //assert row num
 
-                    }
-                
+                        }
+                    
+                }
             }
             
         } 
