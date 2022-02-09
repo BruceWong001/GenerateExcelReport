@@ -143,7 +143,7 @@ namespace GenerateExcelLib.Tests
             public List<SessionObj> SessionList{get;set;}
             
         }
-        [Fact(Skip="not finish yet")]
+        [Fact]
         [Trait("Category","ExportData Designer")]
         public void GenerateDataTable_DynamicRows_Validate_ColRow_Num()
         {

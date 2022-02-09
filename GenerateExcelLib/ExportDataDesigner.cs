@@ -59,15 +59,17 @@ namespace GenerateExcelLib
                     var listVal = property_Item.GetValue(_data) as IEnumerable<object>;
                     if (listVal == null) continue;
                     int start_Col=currentCol; // record the column index for the looping of List items
-                    Boolean isFirstTime_inLoop=needAddCol;
+                    Boolean isFirstTime_inLoop=needAddCol; //indicate if below loop needs to add new columns.
+                    Boolean isResueRow_Forbelowloop=true; //indicate below loop if it needs to add a new row or reuse existing one.
                     foreach (var item in listVal)
                     {
                         /*
                          (isFirstTime_inLoop?row:null) this condition means it's firs time to drill down the first item in one list,
                          but you must reuse DataRow object, since you have already create this row on top.
                         */ 
-                        DrillDown(item,start_Col,isFirstTime_inLoop,isFirstTime_inLoop?row:null);
+                        DrillDown(item,start_Col,isFirstTime_inLoop,isResueRow_Forbelowloop?row:null);
                         isFirstTime_inLoop=false;
+                        isResueRow_Forbelowloop=false;
                     }
                 }
                 else if(!IsBasicType)
