@@ -37,7 +37,7 @@ namespace GenerateExcelLib
             {
                 for (int k = 0; k < Colnum; k++)
                 {
-                    cells[startRow_position + i, k].PutValue(data.Rows[i][k].ToString()); //
+                    cells[startRow_position + i, k].PutValue(data.Rows[i][k].ToString(),true,true); //
                 }
             }
             sheet.AutoFitColumns(); //
@@ -47,8 +47,9 @@ namespace GenerateExcelLib
         ///
         /// merge specified cell in excel.
         /// The Workbook should be a avaiable object. all int parameter should be greater than zero, otherwise will throw the exception.
+        /// Note:the index from 1, not 0
         ///
-        public Workbook MergeCell(Workbook wb,int firstCol,int firstRow,int totalCols, int totalRows)
+        public void MergeCell(Workbook wb,int firstCol,int firstRow,int totalCols, int totalRows)
         {
             if(!((firstCol>0)&&(firstRow>0)&&(totalCols>0)&&(totalRows>0)))
             {
@@ -56,8 +57,6 @@ namespace GenerateExcelLib
             }
 
             wb.Worksheets[0].Cells.Merge(firstRow-1,firstCol-1,totalRows,totalCols);
-
-            return wb; //      
 
         }
     }

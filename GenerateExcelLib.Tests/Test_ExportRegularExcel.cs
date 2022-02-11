@@ -43,7 +43,7 @@ namespace GenerateExcelLib.Tests
                 {
                     using(MemoryStream ms=new MemoryStream(new byte[5000000]))
                     {
-                        //save excel file content into tempfile(memory stream)
+                        //save excel file content into tempfile(memory stream). test only
                         result_workbook.Save(ms,SaveFormat.Xlsx);
 
                         //Assert: result
@@ -166,15 +166,16 @@ namespace GenerateExcelLib.Tests
             using(DataTable mydata=Initial_Simple_DataTable())
             {
                 var work_book=new ExportRegularExcel();
-                var merge_Book= work_book.GenerateExcel(mydata);
-                //run test function
-                using( Workbook mergedBook= work_book.MergeCell(merge_Book,2,2,1,2))
+                using(var merge_Book= work_book.GenerateExcel(mydata))
                 {
+                    //run test function
+                    work_book.MergeCell(merge_Book,2,2,1,2);
+                
                     using(MemoryStream ms=new MemoryStream(new byte[5000000]))
                     {
                         //save excel file content into tempfile(memory stream)
-                        mergedBook.Save(ms,SaveFormat.Xlsx);
-                       // mergedBook.Save(@"c:\test.xlsx"); // only for debug
+                        merge_Book.Save(ms,SaveFormat.Xlsx);
+                       // merge_Book.Save(@"c:\test.xlsx"); // only for debug
                         //Assert result
                         var result=Excel_Ops_Aspose.Is_MergeCell(ms,2,2,1,2);
                         Assert.True(result); //assert the spicified area is merged.
@@ -193,15 +194,16 @@ namespace GenerateExcelLib.Tests
             using(DataTable mydata=Initial_Simple_DataTable())
             {
                 var work_book=new ExportRegularExcel();
-                var merge_Book= work_book.GenerateExcel(mydata);
-                //run test function
-                using( Workbook mergedBook= work_book.MergeCell(merge_Book,1,3,2,1))
+                using(var merge_Book= work_book.GenerateExcel(mydata))
                 {
+                    //run test function
+                    work_book.MergeCell(merge_Book,1,3,2,1);
+                
                     using(MemoryStream ms=new MemoryStream(new byte[5000000]))
                     {
                         //save excel file content into tempfile(memory stream)
-                        mergedBook.Save(ms,SaveFormat.Xlsx);
-                       // mergedBook.Save(@"c:\test.xlsx"); // only for debug
+                        merge_Book.Save(ms,SaveFormat.Xlsx);
+                       // merge_Book.Save(@"c:\test.xlsx"); // only for debug
                         //Assert result
                         var result=Excel_Ops_Aspose.Is_MergeCell(ms,1,3,2,1);
                         Assert.True(result); //assert the spicified area is merged.

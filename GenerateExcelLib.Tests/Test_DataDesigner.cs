@@ -44,6 +44,7 @@ namespace GenerateExcelLib.Tests
             }
             
         } 
+
         class SimpleClassEx
         {
             public string ClassTitle{get;set;}
@@ -109,6 +110,25 @@ namespace GenerateExcelLib.Tests
                 Assert.Equal("Java",table.Rows[1][1].ToString());
             }
         }        
+        [Fact]
+        [Trait("Category","MergedCells")]
+        public void ValidateMergedCells_AtBegin()
+        {
+            // Given
+            ListStart data=new ListStart(){Sessions=new List<SessionTime>(){new SessionTime{Session=DateTime.Now},new SessionTime{Session=DateTime.Now.AddDays(1)}},
+                                     ClassTitle="Java",ClassCode="10010"};
+            // When
+            using(var designer=new ExportDataDesigner<ListStart>(data))
+            {
+                DataTable table=designer.GeneratDataTable();
+                var mergeCells=designer.MergeCells;
+                // Then
+                Assert.Equal(2,mergeCells.Count);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(1,0,1,2),mergeCells["1-0"]);
+
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(2,0,1,2),mergeCells["2-0"]);
+            }
+        }    
         class ListEnd
         {   
             public string ClassTitle{get;set;}
@@ -133,6 +153,7 @@ namespace GenerateExcelLib.Tests
             }
 
         }
+ 
         [Fact]
         [Trait("Category","ExportData Designer")]
         public void ValidateCellValue_DynamicRows_AtEnd()
@@ -154,6 +175,31 @@ namespace GenerateExcelLib.Tests
             }
 
         }    
+        [Fact]
+        [Trait("Category","MergedCells")]
+        public void ValidateMergedCells_AtEnd()
+        {
+            // Given
+            ListEnd data=new ListEnd(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
+                       learners= new List<Learner>{new Learner{Name="Lily",Age=20},new Learner{Name="Joe",Age=20},new Learner{Name="Wuli",Age=28}}};
+            // When
+            using(var designer=new ExportDataDesigner<ListEnd>(data))
+            {
+                DataTable table=designer.GeneratDataTable();
+                var mergeCells=designer.MergeCells;
+                // Then
+                Assert.Equal(4,mergeCells.Count);
+
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(0,0,1,3),mergeCells["0-0"]);
+
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(1,0,1,3),mergeCells["1-0"]);   
+                
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(2,0,1,3),mergeCells["2-0"]);
+
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(4,0,1,2),mergeCells["4-0"]);
+
+            }
+        }
         class ListMiddle
         {   
             public string ClassTitle{get;set;}
@@ -265,6 +311,33 @@ namespace GenerateExcelLib.Tests
             }
 
         }  
+        [Fact]
+        [Trait("Category","MergedCells")]
+        public void GenerateDataTable_DynamicRows_MergeCells()
+        {
+            // Given
+            ComprehensiveObj data=new ComprehensiveObj(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
+                       
+                       SessionList=new List<SessionObj>{new SessionObj{Session=DateTime.Now,Learners=new List<Learner>{new Learner{Name="Bruce",Age=30},new Learner{Name="Lily",Age=30}}},
+                                            new SessionObj{Session=DateTime.Now.AddDays(1),Learners=new List<Learner>{new Learner{Name="Bruce",Age=30}}}}                            
+                        
+                       };
+            // When
+            using(var designer=new ExportDataDesigner<ComprehensiveObj>(data))
+            {
+                DataTable table=designer.GeneratDataTable();
+                Dictionary<string,Tuple<int,int,int,int>> mergeCells=designer.MergeCells;
+                // Then
+                Assert.Equal<int>(5,mergeCells.Count);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(0,0,1,3),mergeCells["0-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(1,0,1,3),mergeCells["1-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(2,0,1,3),mergeCells["2-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(3,0,1,2),mergeCells["3-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(5,0,1,3),mergeCells["5-0"]);
+                
+            }
+
+        }
 
     }
 }
