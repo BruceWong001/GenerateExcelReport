@@ -6,8 +6,23 @@ using Aspose.Cells;
 
 namespace GenerateExcelLib
 {
-    public class ExportRegularExcel
+    public class ExportRegularExcel : IDisposable
     {
+        private Workbook _book;
+
+        public ExportRegularExcel()
+        {
+            _book = new Workbook();
+        }
+
+        /// <summary>
+        /// allow create excel from exist template
+        /// </summary>
+        /// <param name="stream"></param>
+        public ExportRegularExcel(Stream stream)
+        {
+            _book = new Workbook(stream);
+        }
 
         ///
         /// Generate excel from DataTable. data column name should be table header in excel.
@@ -15,8 +30,8 @@ namespace GenerateExcelLib
         ///
         public Workbook GenerateExcel(DataTable data,int startRow=1,Boolean needHead=true)
         {
-            Workbook book = new Workbook(); 
-            Worksheet sheet = book.Worksheets[0]; 
+            
+            Worksheet sheet = _book.Worksheets[0]; 
             Cells cells = sheet.Cells; 
 
 
@@ -42,7 +57,7 @@ namespace GenerateExcelLib
                 }
             }
             sheet.AutoFitColumns(); //
-            return book; //      
+            return _book; //      
 
         }
         ///
@@ -70,6 +85,11 @@ namespace GenerateExcelLib
                 
                 MergeCell(wb,startColNum,startRowNum,coordinate.Item3,coordinate.Item4);
             }
+        }
+
+        public void Dispose()
+        {
+            _book?.Dispose();
         }
     }
 }
