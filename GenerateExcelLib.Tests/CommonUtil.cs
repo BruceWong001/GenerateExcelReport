@@ -67,15 +67,18 @@ namespace GenerateExcelLib.Tests
                         int row_range=totalRows-1; // merge row range
                         int exact_startcol=startCol-1;
                         int exact_startrow=startRow-1;
-                        
-                        CellArea mergedCell=(CellArea)mergedlist[0];
-                        return (mergedCell.StartColumn==(startCol-1) && mergedCell.StartRow==(startRow-1) &&
-                                mergedCell.EndColumn==exact_startcol+col_range && mergedCell.EndRow==exact_startrow+row_range);
+                        foreach(CellArea mergedCell in mergedlist)
+                        {
+                            if(mergedCell.StartColumn==(startCol-1) && mergedCell.StartRow==(startRow-1) &&
+                                    mergedCell.EndColumn==exact_startcol+col_range && mergedCell.EndRow==exact_startrow+row_range)
+                                    {
+                                        return true;
+                                    }
+                        }
                     }
-                    else 
-                    {
-                        return false;
-                    }
+                    
+                    return false;
+                    
                 }
             
             }

@@ -318,7 +318,7 @@ namespace GenerateExcelLib.Tests
             // Given
             ComprehensiveObj data=new ComprehensiveObj(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
                        
-                       SessionList=new List<SessionObj>{new SessionObj{Session=DateTime.Now,Learners=new List<Learner>{new Learner{Name="Bruce",Age=30},new Learner{Name="Lily",Age=30}}},
+                       SessionList=new List<SessionObj>{new SessionObj{Session=DateTime.Now,Learners=new List<Learner>{new Learner{Name="Bruce",Age=20},new Learner{Name="Lily",Age=30}}},
                                             new SessionObj{Session=DateTime.Now.AddDays(1),Learners=new List<Learner>{new Learner{Name="Bruce",Age=30}}}}                            
                         
                        };
@@ -333,7 +333,7 @@ namespace GenerateExcelLib.Tests
                 Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(1,0,1,3),mergeCells["1-0"]);
                 Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(2,0,1,3),mergeCells["2-0"]);
                 Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(3,0,1,2),mergeCells["3-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(5,0,1,3),mergeCells["5-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(5,1,1,2),mergeCells["5-1"]);
                 
             }
 

@@ -93,7 +93,7 @@ namespace GenerateExcelLib.Tests
             }
             
         } 
-       [Fact]
+        [Fact]
         [Trait("Category","Assemble")]
         public void MergeCell_ComplexContentObject()
         {
@@ -110,17 +110,20 @@ namespace GenerateExcelLib.Tests
                     using(var Result_Book= work_book.GenerateExcel(mydata))
                     {
                         //When: run test function
-                        work_book.MergeCell(Result_Book,2,2,1,2);
+                        work_book.MergeCell(Result_Book,designer.MergeCells); 
                     
                         using(MemoryStream ms=new MemoryStream(new byte[5000000]))
                         {
                             //save excel file content into tempfile(memory stream)
                             Result_Book.Save(ms,SaveFormat.Xlsx);
-                           // Result_Book.Save(@"c:\test.xlsx"); // only for debug
+                          //  Result_Book.Save(@"c:\test.xlsx"); // only for debug
+                          // first col (one based),first row (one based), total cols(one based), total rows(one based)
                             //Then: Assert result
-                            var result=Excel_Ops_Aspose.Is_MergeCell(ms,2,2,1,2);
-                            Assert.True(result); //assert the spicified area is merged.
-
+                            Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,1,2,1,3)); //assert the spicified area is merged.
+                            Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,2,2,1,3));
+                            Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,3,2,1,3));
+                            Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,4,2,1,2));
+                            Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,5,2,1,2));
                         }
                     
                     }

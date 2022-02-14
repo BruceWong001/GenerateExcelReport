@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Cells;
 
 namespace GenerateExcelLib
@@ -58,6 +59,17 @@ namespace GenerateExcelLib
 
             wb.Worksheets[0].Cells.Merge(firstRow-1,firstCol-1,totalRows,totalCols);
 
+        }
+        public void MergeCell(Workbook wb,Dictionary<string,Tuple<int,int,int,int>> mergedCells,Boolean includedHead=true)
+        {
+            int StartPosition=includedHead?1:0;
+            foreach(var coordinate in mergedCells.Values)
+            {
+                var startColNum=coordinate.Item1+1;
+                var startRowNum=coordinate.Item2+1+StartPosition;
+                
+                MergeCell(wb,startColNum,startRowNum,coordinate.Item3,coordinate.Item4);
+            }
         }
     }
 }

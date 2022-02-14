@@ -203,7 +203,7 @@ namespace GenerateExcelLib.Tests
                     {
                         //save excel file content into tempfile(memory stream)
                         merge_Book.Save(ms,SaveFormat.Xlsx);
-                       // merge_Book.Save(@"c:\test.xlsx"); // only for debug
+                      //  merge_Book.Save(@"c:\test.xlsx"); // only for debug
                         //Assert result
                         var result=Excel_Ops_Aspose.Is_MergeCell(ms,1,3,2,1);
                         Assert.True(result); //assert the spicified area is merged.
