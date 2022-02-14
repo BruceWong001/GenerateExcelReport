@@ -6,7 +6,7 @@ using Aspose.Cells;
 
 namespace GenerateExcelLib
 {
-    public class ExportRegularExcel : IDisposable
+    public class ExportRegularExcel
     {
         private Workbook _book;
 
@@ -33,8 +33,6 @@ namespace GenerateExcelLib
             
             Worksheet sheet = _book.Worksheets[0]; 
             Cells cells = sheet.Cells; 
-
-
             int Colnum = data.Columns.Count; 
             int Rownum = data.Rows.Count;
             int startRow_position=startRow-1; // by default row should start from the first first row.
@@ -85,11 +83,6 @@ namespace GenerateExcelLib
                 
                 MergeCell(wb,startColNum,startRowNum,coordinate.Item3,coordinate.Item4);
             }
-        }
-
-        public void Dispose()
-        {
-            _book?.Dispose();
-        }
+        }      
     }
 }
