@@ -104,7 +104,7 @@ namespace GenerateExcelLib
         private void CopyRowValuefromAboveRow(int currentColNumber,int currentRowNumber,DataRow newRow,DataRow oldRow)
         {
             int rowCount=m_DT.Rows.Count;
-            if(rowCount>1 && oldRow is not null)
+            if(rowCount>1 && oldRow != null)
             {
                 //only handle there is existing data.
                 for(int colIndex=0;colIndex<m_DT.Columns.Count;colIndex++)
