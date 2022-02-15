@@ -338,6 +338,34 @@ namespace GenerateExcelLib.Tests
             }
 
         }
+        [Fact]
+        [Trait("Category","MergedCells")]
+        public void GenerateDataTable_DynamicRows_MergeCells_2()
+        {
+            // Given
+            ComprehensiveObj data=new ComprehensiveObj(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
+                       
+                       SessionList=new List<SessionObj>{new SessionObj{Session=DateTime.Now,Learners=new List<Learner>{new Learner{Name="Bruce",Age=20},new Learner{Name="Lily",Age=30}}},
+                                            new SessionObj{Session=DateTime.Now.AddDays(1),Learners=new List<Learner>{new Learner{Name="Bruce",Age=35},new Learner{Name="Joe",Age=31}}},
+                                            new SessionObj{Session=DateTime.Now.AddDays(1).AddHours(1),Learners=new List<Learner>{new Learner{Name="Lily",Age=20}}}}                            
+                        
+                       };
+            // When
+            using(var designer=new ExportDataDesigner<ComprehensiveObj>(data))
+            {
+                DataTable table=designer.GeneratDataTable();
+                Dictionary<string,Tuple<int,int,int,int>> mergeCells=designer.MergeCells;
+                // Then
+                Assert.Equal<int>(5,mergeCells.Count);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(0,0,1,5),mergeCells["0-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(1,0,1,5),mergeCells["1-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(2,0,1,5),mergeCells["2-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(3,0,1,2),mergeCells["3-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(3,2,1,2),mergeCells["3-2"]);
+
+            }
+
+        }
 
     }
 }

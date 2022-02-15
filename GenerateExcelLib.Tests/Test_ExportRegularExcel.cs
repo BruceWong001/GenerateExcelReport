@@ -236,17 +236,6 @@ namespace GenerateExcelLib.Tests
 
 
         }
-        [Fact(Skip="demo skip")]
-        public void Export_MergeCell_demoSkip()
-        {
-            var work_book=new ExportRegularExcel();
-            
-
-            //run test function
-            var exception= Assert.Throws<NullReferenceException>(()=> work_book.MergeCell(null,1,1,1,2));
-
-
-        }
                  
     }
 

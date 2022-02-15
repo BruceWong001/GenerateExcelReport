@@ -17,7 +17,7 @@ namespace GenerateExcelLib
         // final designed data table. all columns and rows will reuse this object. 
         private DataTable m_DT=new DataTable(); 
         // item's order in Tuple are first Col, first Row,total Cols, total Rows
-        // the format of key is 'recursion level-ColIndex' when drill down current Data, since the merge should happen on same level and same value on same column.
+        // the format of key is 'start_ColIndex-start_RowIndex' when drill down current Data, since the merge should happen on same level and same value on same column.
         private Dictionary<string,Tuple<int,int,int,int>> m_MergeCells=new Dictionary<string,Tuple<int, int, int, int>>();
         //The data which need to conver to DataTable, it's a generic type, you can define by yourself,
         //if you have array or collection type property in your data definition, please use List<T>. 
@@ -109,16 +109,33 @@ namespace GenerateExcelLib
                 //only handle there is existing data.
                 for(int colIndex=0;colIndex<m_DT.Columns.Count;colIndex++)
                 {
-                    newRow[colIndex]=oldRow[colIndex];
-                    // copy row means all columns in row should be merged from beginning.
                     if(colIndex< currentColNumber)
-                    {
+                    {// only need to copy the columns value before current column.
+                        newRow[colIndex]=oldRow[colIndex];
+                        // copy row means all columns in row should be merged from beginning.
                         //the currentColNumber records when trigger the copy event. it means, before this column all copy the cells should be merged.
-                        if(m_DT.Columns.Count>currentColNumber+1)
+                        if(m_DT.Columns.Count>1)
                         {//by default, first column should not be needed to merge, so ignore it.
-                            UpdateMergeCoordinate(currentRowNumber,colIndex);
+                            //UpdateMergeCoordinate(currentRowNumber,colIndex);
+                            Tuple<int,int> ret= FindMergeRows(colIndex,currentRowNumber,newRow[colIndex]); // To find same value rowindex and row count.
+                            if(ret.Item2>1)
+                            {
+                                //when merged cell count >1, then it should be merged.
+                                //current cloumn from return row should be merged.
+                                string key=$"{colIndex}-{ret.Item1}";               
+                                if(m_MergeCells.ContainsKey(key))
+                                {
+                                    Tuple<int,int,int,int> originOne=m_MergeCells[key];
+                                    m_MergeCells[key]=new Tuple<int, int, int, int>(colIndex,ret.Item1,1,ret.Item2);
+                                }
+                                else
+                                {
+                                    m_MergeCells.Add(key,new Tuple<int, int, int, int>(colIndex,ret.Item1,1,ret.Item2));
+                                }
+                            }
                         }
                     }
+
                 }
                 
             }
@@ -172,7 +189,9 @@ namespace GenerateExcelLib
             }
             
         }
-
+        ///
+        /// fine merge cells and return start row number. the condition is for certain column.
+        ///
         private Tuple<int, int> FindMergeRows(int colIndex, int currentRow, object value)
         {
             int startRow=currentRow;
@@ -192,23 +211,6 @@ namespace GenerateExcelLib
             return new Tuple<int, int>(startRow,mergeCount);
         }
 
-        private void  UpdateMergeCoordinate(int currentRow,int colIndex)
-        { 
-            if(currentRow>0)
-            {
-                string key=$"{colIndex}-{0}";
-                if(m_MergeCells.ContainsKey(key))
-                {
-                    Tuple<int,int,int,int> originOne=m_MergeCells[key];
-                    m_MergeCells[key]=new Tuple<int, int, int, int>(colIndex,originOne.Item2,1,originOne.Item4+1);
-                }
-                else
-                {
-                    m_MergeCells.Add(key,new Tuple<int, int, int, int>(colIndex,0,1,2));
-                }
-            }
-
-        }
         ///
         /// the DataTable which return to the caller will be disposed when current ExportDataDesigner dispose.
         /// so no need to dispose explicitly
