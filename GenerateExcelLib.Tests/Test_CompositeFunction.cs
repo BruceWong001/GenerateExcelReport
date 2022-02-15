@@ -159,7 +159,7 @@ namespace GenerateExcelLib.Tests
                         {
                             //save excel file content into tempfile(memory stream)
                             Result_Book.Save(ms,SaveFormat.Xlsx);
-                            Result_Book.Save(@"c:\test.xlsx"); // only for debug
+                          //  Result_Book.Save(@"c:\test.xlsx"); // only for debug
                           // first col (one based),first row (one based), total cols(one based), total rows(one based)
                             //Then: Assert result
                             Assert.Equal<int>(7,designer.MergeCells.Count);
