@@ -17,6 +17,13 @@ namespace GenerateExcelLib.Tests
     class SessionTime
     {
         public DateTime Session{get;set;}
+        public string SessionName{get;set;}
+    }
+    class SessionTime2Elements
+    {
+        public DateTime Session{get;set;}
+        public List<Learner> Learners{get;set;}
+        public string Address{get;set;}
     }
 
     public class Test_ExportDataDesigner
@@ -70,6 +77,7 @@ namespace GenerateExcelLib.Tests
             }
             
         }         
+        
         class ListStart
         {
             public List<SessionTime> Sessions {get;set;}
@@ -81,7 +89,7 @@ namespace GenerateExcelLib.Tests
         public void GenerateDataTable_DynamicRows_AtBegin()
         {
             // Given
-            ListStart data=new ListStart(){Sessions=new List<SessionTime>(){new SessionTime{Session=DateTime.Now},new SessionTime{Session=DateTime.Now.AddDays(1)}},
+            ListStart data=new ListStart(){Sessions=new List<SessionTime>(){new SessionTime{Session=DateTime.Now,SessionName="class1"},new SessionTime{Session=DateTime.Now.AddDays(1),SessionName="class2"}},
                                      ClassTitle="Java",ClassCode="10010"};
             // When
             using(var designer=new ExportDataDesigner<ListStart>(data))
@@ -89,7 +97,7 @@ namespace GenerateExcelLib.Tests
                 DataTable table=designer.GeneratDataTable();
                 // Then
                 Assert.Equal(2,table.Rows.Count);
-                Assert.Equal(3,table.Columns.Count);
+                Assert.Equal(4,table.Columns.Count);
             }
         }
         [Fact]
@@ -97,17 +105,17 @@ namespace GenerateExcelLib.Tests
         public void ValidateCellValue_DynamicRows_AtBegin()
         {
             // Given
-            ListStart data=new ListStart(){Sessions=new List<SessionTime>(){new SessionTime{Session=DateTime.Now},new SessionTime{Session=DateTime.Now.AddDays(1)}},
+            ListStart data=new ListStart(){Sessions=new List<SessionTime>(){new SessionTime{Session=DateTime.Now,SessionName="class1"},new SessionTime{Session=DateTime.Now.AddDays(1),SessionName="class2"}},
                                      ClassTitle="Java",ClassCode="10010"};
             // When
             using(var designer=new ExportDataDesigner<ListStart>(data))
             {
                 DataTable table=designer.GeneratDataTable();
                 // Then
-                Assert.Equal("10010",table.Rows[0][2].ToString());
-                Assert.Equal("10010",table.Rows[1][2].ToString());
-                Assert.Equal("Java",table.Rows[0][1].ToString());
-                Assert.Equal("Java",table.Rows[1][1].ToString());
+                Assert.Equal("10010",table.Rows[0][3].ToString());
+                Assert.Equal("10010",table.Rows[1][3].ToString());
+                Assert.Equal("Java",table.Rows[0][2].ToString());
+                Assert.Equal("Java",table.Rows[1][2].ToString());
             }
         }        
         [Fact]
@@ -115,7 +123,7 @@ namespace GenerateExcelLib.Tests
         public void ValidateMergedCells_AtBegin()
         {
             // Given
-            ListStart data=new ListStart(){Sessions=new List<SessionTime>(){new SessionTime{Session=DateTime.Now},new SessionTime{Session=DateTime.Now.AddDays(1)}},
+            ListStart data=new ListStart(){Sessions=new List<SessionTime>(){new SessionTime{Session=DateTime.Now,SessionName="aaa"},new SessionTime{Session=DateTime.Now.AddDays(1),SessionName="bbb"}},
                                      ClassTitle="Java",ClassCode="10010"};
             // When
             using(var designer=new ExportDataDesigner<ListStart>(data))
@@ -124,9 +132,9 @@ namespace GenerateExcelLib.Tests
                 var mergeCells=designer.MergeCells;
                 // Then
                 Assert.Equal(2,mergeCells.Count);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(1,0,1,2),mergeCells["1-0"]);
-
                 Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(2,0,1,2),mergeCells["2-0"]);
+
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(3,0,1,2),mergeCells["3-0"]);
             }
         }    
         class ListEnd
@@ -134,7 +142,7 @@ namespace GenerateExcelLib.Tests
             public string ClassTitle{get;set;}
             public string ClassCode{get;set;}
             public string Trainer {get;set;}
-            public List<Learner> learners {get;set;}
+            public List<SessionTime2Elements> Sessions {get;set;}
         }
         [Fact]
         [Trait("Category","ExportData Designer")]
@@ -142,14 +150,16 @@ namespace GenerateExcelLib.Tests
         {
             // Given
             ListEnd data=new ListEnd(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
-                       learners= new List<Learner>{new Learner{Name="Lily",Age=20},new Learner{Name="Joe",Age=19},new Learner{Name="Wuli",Age=28}}};
+                       Sessions= new List<SessionTime2Elements>{new SessionTime2Elements{Session=DateTime.Now,Address="aaa", Learners=new List<Learner>{ new Learner{Name="Lily",Age=20}}},
+                       new SessionTime2Elements{ Session=DateTime.Now.AddDays(1),Address="bbbb", Learners=new List<Learner>{ new Learner{Name="Joe",Age=19},new Learner{Name="Bruce",Age=20}}},
+                       new SessionTime2Elements{Session=DateTime.Now.AddDays(2),Address="ccc", Learners=new List<Learner>{ new Learner{Name="Wuli",Age=28}}}}};
             // When
             using(var designer=new ExportDataDesigner<ListEnd>(data))
             {
                 DataTable table=designer.GeneratDataTable();
                 // Then
-                Assert.Equal(3,table.Rows.Count);
-                Assert.Equal(5,table.Columns.Count);
+                Assert.Equal(4,table.Rows.Count);
+                Assert.Equal(7,table.Columns.Count);
             }
 
         }
@@ -160,7 +170,9 @@ namespace GenerateExcelLib.Tests
         {
             // Given
             ListEnd data=new ListEnd(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
-                       learners= new List<Learner>{new Learner{Name="Lily",Age=20},new Learner{Name="Joe",Age=19},new Learner{Name="Wuli",Age=28}}};
+                       Sessions= new List<SessionTime2Elements>{new SessionTime2Elements{Session=DateTime.Now,Address="aaa", Learners=new List<Learner>{ new Learner{Name="Lily",Age=20}}},
+                       new SessionTime2Elements{ Session=DateTime.Now.AddDays(1),Address="bbb",Learners=new List<Learner>{ new Learner{Name="Joe",Age=19},new Learner{Name="Bruce",Age=20}}},
+                       new SessionTime2Elements{Session=DateTime.Now.AddDays(2),Address="ccc",Learners=new List<Learner>{ new Learner{Name="Wuli",Age=28}}}}};
             // When
             using(var designer=new ExportDataDesigner<ListEnd>(data))
             {
@@ -172,6 +184,10 @@ namespace GenerateExcelLib.Tests
                 Assert.Equal("Java",table.Rows[2][0].ToString());
                 Assert.Equal("Bill",table.Rows[1][2].ToString());
                 Assert.Equal("Bill",table.Rows[2][2].ToString());
+                Assert.Equal("aaa",table.Rows[0][6].ToString());
+                Assert.Equal("bbb",table.Rows[1][6].ToString());
+                Assert.Equal("bbb",table.Rows[2][6].ToString());
+                Assert.Equal("ccc",table.Rows[3][6].ToString());
             }
 
         }    
@@ -181,30 +197,32 @@ namespace GenerateExcelLib.Tests
         {
             // Given
             ListEnd data=new ListEnd(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
-                       learners= new List<Learner>{new Learner{Name="Lily",Age=20},new Learner{Name="Joe",Age=20},new Learner{Name="Wuli",Age=28}}};
+                       Sessions= new List<SessionTime2Elements>{new SessionTime2Elements{Session=DateTime.Now, Address="aaa", Learners=new List<Learner>{ new Learner{Name="Lily",Age=20}}},
+                       new SessionTime2Elements{ Session=DateTime.Now.AddDays(1),Address="bbb" ,Learners=new List<Learner>{ new Learner{Name="Joe",Age=19},new Learner{Name="Bruce",Age=20}}},
+                       new SessionTime2Elements{Session=DateTime.Now.AddDays(2),Address="ccc",Learners=new List<Learner>{ new Learner{Name="Wuli",Age=28}}}}};
             // When
             using(var designer=new ExportDataDesigner<ListEnd>(data))
             {
                 DataTable table=designer.GeneratDataTable();
                 var mergeCells=designer.MergeCells;
                 // Then
-                Assert.Equal(4,mergeCells.Count);
+                Assert.Equal(5,mergeCells.Count);
 
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(0,0,1,3),mergeCells["0-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(0,0,1,4),mergeCells["0-0"]);
 
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(1,0,1,3),mergeCells["1-0"]);   
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(1,0,1,4),mergeCells["1-0"]);   
                 
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(2,0,1,3),mergeCells["2-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(2,0,1,4),mergeCells["2-0"]);
 
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(4,0,1,2),mergeCells["4-0"]);
-
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(3,1,1,2),mergeCells["3-1"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(6,1,1,2),mergeCells["6-1"]);
             }
         }
         class ListMiddle
         {   
             public string ClassTitle{get;set;}
             public string ClassCode{get;set;}            
-            public List<SessionTime> Sessions {get;set;}
+            public List<SessionTime2Elements> Sessions {get;set;}
             public string Trainer {get;set;}
             
         }
@@ -214,14 +232,16 @@ namespace GenerateExcelLib.Tests
         {
             // Given
             ListMiddle data=new ListMiddle(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
-                       Sessions= new List<SessionTime>{new SessionTime{Session=DateTime.Now},new SessionTime{Session=DateTime.Now.AddDays(1)},new SessionTime{Session=DateTime.Now.AddDays(2)}}};
+                       Sessions= new List<SessionTime2Elements>{new SessionTime2Elements{Session=DateTime.Now, Address="aaa", Learners=new List<Learner>{new Learner{Name="Bruce",Age=20},new Learner{Name="Lily",Age=19}}},
+                       new SessionTime2Elements{Session=DateTime.Now.AddDays(1),Address="bbb",Learners=new List<Learner>{new Learner{Name="Joe",Age=29},new Learner{Name="Andy",Age=19}}},
+                       new SessionTime2Elements{Session=DateTime.Now.AddDays(2),Address="ccc",Learners=new List<Learner>{new Learner{Name="Nancy",Age=20}}}}};
             // When
             using(var designer=new ExportDataDesigner<ListMiddle>(data))
             {
                 DataTable table=designer.GeneratDataTable();
                 // Then
-                Assert.Equal(3,table.Rows.Count);
-                Assert.Equal(4,table.Columns.Count);
+                Assert.Equal(5,table.Rows.Count);
+                Assert.Equal(7,table.Columns.Count);
             }
 
         }
@@ -231,18 +251,29 @@ namespace GenerateExcelLib.Tests
         {
             // Given
             ListMiddle data=new ListMiddle(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
-                       Sessions= new List<SessionTime>{new SessionTime{Session=DateTime.Now},new SessionTime{Session=DateTime.Now.AddDays(1)},new SessionTime{Session=DateTime.Now.AddDays(2)}}};
+                       Sessions= new List<SessionTime2Elements>{new SessionTime2Elements{Session=DateTime.Now, Address="aaa", Learners=new List<Learner>{new Learner{Name="Bruce",Age=20},new Learner{Name="Lily",Age=19}}},
+                       new SessionTime2Elements{Session=DateTime.Now.AddDays(1),Address="bbb",Learners=new List<Learner>{new Learner{Name="Joe",Age=29},new Learner{Name="Andy",Age=19}}},
+                       new SessionTime2Elements{Session=DateTime.Now.AddDays(2),Address="ccc",Learners=new List<Learner>{new Learner{Name="Nancy",Age=20}}}}};
+           
             // When
             using(var designer=new ExportDataDesigner<ListMiddle>(data))
                 {
                 DataTable table=designer.GeneratDataTable();
             // Then
                 Assert.Equal("10010",table.Rows[1][1].ToString());
-                Assert.Equal("10010",table.Rows[2][1].ToString());
+                Assert.Equal("10010",table.Rows[4][1].ToString());
                 Assert.Equal("Java",table.Rows[1][0].ToString());
-                Assert.Equal("Java",table.Rows[2][0].ToString());
-                Assert.Equal("Bill",table.Rows[1][3].ToString());
-                Assert.Equal("Bill",table.Rows[2][3].ToString());
+                Assert.Equal("Java",table.Rows[4][0].ToString());
+                Assert.Equal("Bill",table.Rows[0][6].ToString());
+                Assert.Equal("Bill",table.Rows[1][6].ToString());
+                Assert.Equal("Bill",table.Rows[2][6].ToString());
+                Assert.Equal("Bill",table.Rows[3][6].ToString());
+                Assert.Equal("Bill",table.Rows[4][6].ToString());
+                Assert.Equal("aaa",table.Rows[0][5].ToString());
+                Assert.Equal("aaa",table.Rows[1][5].ToString());
+                Assert.Equal("Lily",table.Rows[1][3].ToString());
+                Assert.Equal("bbb",table.Rows[2][5].ToString());
+                Assert.Equal("bbb",table.Rows[3][5].ToString());
             }
 
         }  

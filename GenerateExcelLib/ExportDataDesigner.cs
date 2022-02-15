@@ -73,14 +73,14 @@ namespace GenerateExcelLib
                          (isFirstTime_inLoop?row:null) this condition means it's firs time to drill down the first item in one list,
                          but you must reuse DataRow object, since you have already create this row on top.
                         */ 
-                        DrillDown(item,start_Col,currentRowNum,isFirstTime_inLoop,isResueRow_Forbelowloop?row:null);
+                        currentCol= DrillDown(item,start_Col,currentRowNum,isFirstTime_inLoop,isResueRow_Forbelowloop?row:null);
                         isFirstTime_inLoop=false;
                         isResueRow_Forbelowloop=false;
                     }
                 }
                 else if(!IsBasicType)
-                {// if curren property is data object, it should keep drilling down.
-                    currentCol= DrillDown(property_Item.GetValue(_data),currentCol,currentRowNum,true,row);
+                {// if curren property is class object, it should keep drilling down.
+                    currentCol= DrillDown(property_Item.GetValue(_data),currentCol,currentRowNum,needAddCol,row);
                     continue; //since layout all properties from your customized Class, so no need plus column index again.  
                 }
                 else
@@ -93,8 +93,8 @@ namespace GenerateExcelLib
                     var Value=property_Item.GetValue(_data); // add row value
                     row[currentCol]= Value;
                     CopyValuetoBelowRows_ForOneCol(currentCol,currentRowNum,Value);//copy current column's value to all below rows.
-                }
-                currentCol++;
+                    currentCol++;
+                }     
             }
             return currentCol; //return the next column index number.
         }
@@ -107,10 +107,9 @@ namespace GenerateExcelLib
             if(rowCount>1 && oldRow is not null)
             {
                 //only handle there is existing data.
-                for(int colIndex=0;colIndex<m_DT.Columns.Count;colIndex++)
+                for(int colIndex=0;colIndex<currentColNumber;colIndex++)//m_DT.Columns.Count
                 {
-                    if(colIndex< currentColNumber)
-                    {// only need to copy the columns value before current column.
+                    // only need to copy the columns value before current column.
                         newRow[colIndex]=oldRow[colIndex];
                         // copy row means all columns in row should be merged from beginning.
                         //the currentColNumber records when trigger the copy event. it means, before this column all copy the cells should be merged.
@@ -134,7 +133,7 @@ namespace GenerateExcelLib
                                 }
                             }
                         }
-                    }
+                    
 
                 }
                 
@@ -156,15 +155,15 @@ namespace GenerateExcelLib
                         m_DT.Rows[rowNum][colIndex]=value; //set value on all rows but same column.
                     }
                     //current cloumn from row 0 should be merged.
-                    string key=$"{colIndex}-{0}";               
+                    string key=$"{colIndex}-{currentRow}";               
                     if(m_MergeCells.ContainsKey(key))
                     {
                         Tuple<int,int,int,int> originOne=m_MergeCells[key];
-                        m_MergeCells[key]=new Tuple<int, int, int, int>(colIndex,0,1,m_DT.Rows.Count);
+                        m_MergeCells[key]=new Tuple<int, int, int, int>(colIndex,currentRow,1,m_DT.Rows.Count-currentRow);
                     }
                     else
                     {
-                        m_MergeCells.Add(key,new Tuple<int, int, int, int>(colIndex,0,1,m_DT.Rows.Count));
+                        m_MergeCells.Add(key,new Tuple<int, int, int, int>(colIndex,currentRow,1,m_DT.Rows.Count-currentRow));
                     }
                 }
                 else if(currentRow==m_DT.Rows.Count-1)
@@ -198,7 +197,7 @@ namespace GenerateExcelLib
             int mergeCount=1;
             for(int rowIndex=currentRow-1;rowIndex>=0;rowIndex--)
             {
-                if(m_DT.Rows[rowIndex][colIndex].ToString().Equals(value.ToString()))
+                if(m_DT.Rows[rowIndex][colIndex].ToString().Equals(value?.ToString()))
                 {
                     startRow=rowIndex;
                     mergeCount++;
