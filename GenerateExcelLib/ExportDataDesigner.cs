@@ -104,16 +104,21 @@ namespace GenerateExcelLib
                 {
                     if (needAddCol)
                     {
-                        var newCol = new DataColumn(propertyName, property_Item.PropertyType);
-                        if (property_Item.CustomAttributes.Count() > 0)
+                        if (!m_DT.Columns.Contains(property_Item.Name))
                         {
-                            var colPosition = property_Item.GetCustomAttribute<ExportPositionAttribute>();
-                            newCol.Caption = colPosition.ColName;
+                            var newCol = new DataColumn(propertyName, property_Item.PropertyType);
+                            if (property_Item.CustomAttributes.Count() > 0)
+                            {
+                                var colPosition = property_Item.GetCustomAttribute<ExportAttrAttribute>();
+                                newCol.ExtendedProperties.Add(ExportExtendedKey.ColumnName, colPosition.ColName);
+                                newCol.ExtendedProperties.Add(ExportExtendedKey.ColumnType, colPosition.ExportType);
+                            }
+                            m_DT.Columns.Add(newCol); //add column in Data table         
                         }
-                        m_DT.Columns.Add(newCol); //add column in Data table
                     }
 
                     var Value = property_Item.GetValue(_data); // add row value
+                    currentCol = m_DT.Columns[property_Item.Name].Ordinal;
                     row[currentCol] = Value;
                     CopyValuetoBelowRows_ForOneCol(currentCol, currentRowNum, Value);//copy current column's value to all below rows.
                 }
