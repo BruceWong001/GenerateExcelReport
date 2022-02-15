@@ -339,5 +339,50 @@ namespace GenerateExcelLib.Tests
 
         }
 
+        public class ExportSchool
+        {
+            public ExportSchool()
+            {
+                Students = new List<ExportStudent>();
+            }
+
+            [ExportPosition("A")]
+            public string SchoolName { get; set; }
+
+            public List<ExportStudent> Students { get; set; }
+        }
+
+        public class ExportStudent
+        {
+            [ExportPosition("B")]
+            public int Age { get; set; }
+
+            public string Name { get; set; }            
+        }
+
+        [Fact]
+        [Trait("Category", "ExportData Designer")]
+        public void ValidateDateTable_Caption()
+        {
+            var data = new ExportSchool()
+            {
+                SchoolName = "AvePoint",
+                Students = new List<ExportStudent>()
+                {
+                    new ExportStudent()
+                    {
+                        Age = 18,
+                        Name = "Evans"
+                    }
+                }
+            };
+            using (var designer = new ExportDataDesigner<ExportSchool>(data))
+            {
+                DataTable table = designer.GeneratDataTable();
+                Assert.Equal("A", table.Columns[0].Caption);
+                Assert.Equal("B", table.Columns[1].Caption);
+                Assert.Equal("Name", table.Columns[2].Caption);
+            }
+        }
     }
 }
