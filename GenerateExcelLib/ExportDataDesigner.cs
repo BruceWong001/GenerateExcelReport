@@ -8,46 +8,6 @@ using System.Collections.Generic;
 namespace GenerateExcelLib
 {
     ///
-    /// define for merge identifier.
-    ///
-    public class MergeIdentifierAttribute:Attribute
-    {
-        ///
-        /// this Name will be set in rule dictionary, and used by merge follower obj.
-        ///
-        public string Name {get;set;}
-
-        public MergeIdentifierAttribute(string identifierName)
-        {
-            Name=identifierName;
-        }
-
-    }
-    ///
-    /// define for merge follower
-    ///
-    public class MergeFollowerAttribute:Attribute
-    {
-        ///
-        /// this Name will be set in rule dictionary, and used by merge follower obj.
-        ///
-        public string IdentifierName {get;set;}
-
-        public MergeFollowerAttribute(string identifierName)
-        {
-            this.IdentifierName=identifierName;
-        }
-
-    }
-    /// reflection can know current what is current data type.
-    enum StructType
-    {
-        BasicType=0,
-        GenericList,
-        ComplexType
-
-    } 
-    ///
     /// export data structure, defined by end user.
     /// Note: all export field need to be defined via property and public as well.
     /// Note: the index of column and row should be start from 0, not 1.
@@ -68,10 +28,15 @@ namespace GenerateExcelLib
         ///
         private Dictionary<string,int> m_MergeIdentifiers=new Dictionary<string, int>();
         private const string COlEXTENSION_Name="MergeIdentifier";
+        private List<int> m_HiddenCols=new List<int>();
 
         public Dictionary<string,Tuple<int,int,int,int>> MergeCells{get{
             return m_MergeCells;
         }}
+        public List<int> HiddenCols{
+            get{return m_HiddenCols;}
+        }
+
 
         public ExportDataDesigner(T data)
         {
@@ -169,10 +134,9 @@ namespace GenerateExcelLib
             var identifierCol = property_Item.GetCustomAttribute<MergeIdentifierAttribute>();
             if (identifierCol != null)
             {//set merge identifier collection.
-                if (m_MergeIdentifiers.ContainsKey(identifierCol.Name))
-                    m_MergeIdentifiers[identifierCol.Name] = currentCol;
-                else
-                    m_MergeIdentifiers.Add(identifierCol.Name, currentCol);
+                m_MergeIdentifiers.Add(identifierCol.Name, currentCol);
+                m_HiddenCols.Add(currentCol);
+                
             }
             var followerCol = property_Item.GetCustomAttribute<MergeFollowerAttribute>();
             if (followerCol != null)
@@ -271,17 +235,6 @@ namespace GenerateExcelLib
                         }
 
                     }
-                    //
-
-                    // string key=$"{colIndex}-{currentRow}";               
-                    // if(m_MergeCells.ContainsKey(key))
-                    // {
-                    //     m_MergeCells[key]=new Tuple<int, int, int, int>(colIndex,currentRow,1,m_DT.Rows.Count-currentRow);
-                    // }
-                    // else
-                    // {
-                    //     m_MergeCells.Add(key,new Tuple<int, int, int, int>(colIndex,currentRow,1,m_DT.Rows.Count-currentRow));
-                    // }
                 }
                 else if(currentRow==m_DT.Rows.Count-1)
                 {//current row is the last row, so it should find above all same value's rows for current column

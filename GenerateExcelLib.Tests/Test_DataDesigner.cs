@@ -17,7 +17,7 @@ namespace GenerateExcelLib.Tests
     class SessionTime
     {
         public DateTime Session{get;set;}
-        [MergeIdentifier("SessionName")]
+        [MergeIdentifier("SessionName",true)]
         public string SessionName{get;set;}
     }
     class SessionTime2Elements
@@ -433,6 +433,30 @@ namespace GenerateExcelLib.Tests
                 Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(3,2,1,2),mergeCells["3-2"]);
                 Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(4,0,1,2),mergeCells["4-0"]);
                 Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(4,2,1,2),mergeCells["4-2"]);
+            }
+
+        }
+        [Fact]
+        [Trait("Category","DeleteCells")]
+        public void GenerateDataTable_Return_DelColumn()
+        {
+            // Given
+            ClassInfo data=new ClassInfo(){ClassName="Java",ClassCode="10010", Venue="Building No1",
+                       
+                       SessionInfo=new List<SessionTime>{new SessionTime{Session=DateTime.Now,SessionName="Sub 1"},
+                                            new SessionTime{Session=DateTime.Now.AddDays(1),SessionName="Sub 1"},
+                                            new SessionTime{Session=DateTime.Now.AddDays(1),SessionName="Sub 2"},
+                                            new SessionTime{Session=DateTime.Now.AddDays(1).AddHours(1),SessionName="Sub 2"}}                            
+                        
+                       };
+            // When
+            using(var designer=new ExportDataDesigner<ClassInfo>(data))
+            {
+                DataTable table=designer.GeneratDataTable();
+                Dictionary<string,Tuple<int,int,int,int>> mergeCells=designer.MergeCells;
+                // Then
+                Assert.Equal(3,designer.HiddenCols[0]);
+                Assert.Equal(1,designer.HiddenCols.Count);
             }
 
         }
