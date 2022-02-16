@@ -7,6 +7,14 @@ using System.Collections.Generic;
 
 namespace GenerateExcelLib
 {
+    /// reflection can know current what is current data type.
+    enum StructType
+    {
+        BasicType=0,
+        GenericList,
+        ComplexType
+
+    } 
     ///
     /// export data structure, defined by end user.
     /// Note: all export field need to be defined via property and public as well.
@@ -35,6 +43,22 @@ namespace GenerateExcelLib
             m_DT?.Dispose();
 
         }
+        private StructType WhichDataType(PropertyInfo propertyItem)
+        {
+            var IsGenericType = propertyItem.PropertyType.IsGenericType;
+            var IsBasicType= propertyItem.PropertyType.IsPrimitive || propertyItem.PropertyType.Equals(typeof(String)) || 
+                            propertyItem.PropertyType.Equals(typeof(string)) || propertyItem.PropertyType.Equals(typeof(DateTime));
+            var list = propertyItem.PropertyType.GetInterface("IEnumerable", false); //retrieve the collection object.
+            if (IsGenericType && list != null) return StructType.GenericList;
+            if (IsBasicType) 
+                return StructType.BasicType;
+            else
+            {
+                return StructType.ComplexType;
+            }
+            
+        }
+        
         ///
         /// recursion method. list all sub collection into one row.
         ///
@@ -55,46 +79,45 @@ namespace GenerateExcelLib
             }
             var newType = _data.GetType();
             foreach (var property_Item in newType.GetRuntimeProperties())
-            {                
-                var propertyName = property_Item.Name;
-                var IsGenericType = property_Item.PropertyType.IsGenericType;
-                var IsBasicType= property_Item.PropertyType.IsPrimitive || property_Item.PropertyType.Equals(typeof(String)) || 
-                                property_Item.PropertyType.Equals(typeof(string)) || property_Item.PropertyType.Equals(typeof(DateTime));
-                var list = property_Item.PropertyType.GetInterface("IEnumerable", false); //retrieve the collection object.
-                if (IsGenericType && list != null)
-                { // if current property is  a list type.
-                    var listVal = property_Item.GetValue(_data) as IEnumerable<object>;
-                    if (listVal == null) continue;
-                    int start_Col=currentCol; // record the column index for the looping of List items
-                    Boolean isFirstTime_inLoop=needAddCol; //indicate if below loop needs to add new columns.
-                    Boolean isResueRow_Forbelowloop=true; //indicate below loop if it needs to add a new row or reuse existing one.
-                    foreach (var item in listVal)
-                    {   /*
-                         (isFirstTime_inLoop?row:null) this condition means it's firs time to drill down the first item in one list,
-                         but you must reuse DataRow object, since you have already create this row on top.
-                        */ 
-                        currentCol= DrillDown(item,start_Col,currentRowNum,isFirstTime_inLoop,isResueRow_Forbelowloop?row:null);
-                        isFirstTime_inLoop=false;
-                        isResueRow_Forbelowloop=false;
+            { 
+                switch(WhichDataType(property_Item)){
+                    case StructType.BasicType:{
+                        if(needAddCol)
+                        {
+                            m_DT.Columns.Add(property_Item.Name,property_Item.PropertyType); //add column in Data table
+                        }
+                        
+                        var Value=property_Item.GetValue(_data); // add row value
+                        row[currentCol]= Value;    //set current cell's value
+                        CopyValuetoBelowRows_ForOneCol(currentCol,currentRowNum,Value);//copy current column's value to all below rows.
+                        currentCol++;
+                         break;
+                    }
+
+                    case StructType.GenericList:{
+                        // if current property is  a list type.
+                        var listVal = property_Item.GetValue(_data) as IEnumerable<object>;
+                        if (listVal == null) continue;
+                        int start_Col=currentCol; // record the column index for the looping of List items
+                        Boolean isFirstTime_inLoop=needAddCol; //indicate if below loop needs to add new columns.
+                        Boolean isResueRow_Forbelowloop=true; //indicate below loop if it needs to add a new row or reuse existing one.
+                        foreach (var item in listVal)
+                        {   /*
+                            (isFirstTime_inLoop?row:null) this condition means it's firs time to drill down the first item in one list,
+                            but you must reuse DataRow object, since you have already create this row on top.
+                            */ 
+                            currentCol= DrillDown(item,start_Col,currentRowNum,isFirstTime_inLoop,isResueRow_Forbelowloop?row:null);
+                            isFirstTime_inLoop=false;
+                            isResueRow_Forbelowloop=false;
+                        }
+                        break;                        
+                    }
+                    default: {
+                        // if curren property is class object, it should keep drilling down.
+                        currentCol= DrillDown(property_Item.GetValue(_data),currentCol,currentRowNum,needAddCol,row);
+                        continue; //since layout all properties from your customized Class, so no need plus column index again.  
                     }
                 }
-                else if(!IsBasicType)
-                {// if curren property is class object, it should keep drilling down.
-                    currentCol= DrillDown(property_Item.GetValue(_data),currentCol,currentRowNum,needAddCol,row);
-                    continue; //since layout all properties from your customized Class, so no need plus column index again.  
-                }
-                else
-                {
-                    if(needAddCol)
-                    {
-                        m_DT.Columns.Add(propertyName,property_Item.PropertyType); //add column in Data table
-                    }
-                    
-                    var Value=property_Item.GetValue(_data); // add row value
-                    row[currentCol]= Value;
-                    CopyValuetoBelowRows_ForOneCol(currentCol,currentRowNum,Value);//copy current column's value to all below rows.
-                    currentCol++;
-                }     
             }
             return currentCol; //return the next column index number.
         }
@@ -114,29 +137,29 @@ namespace GenerateExcelLib
                         // copy row means all columns in row should be merged from beginning.
                         //the currentColNumber records when trigger the copy event. it means, before this column all copy the cells should be merged.
                         if(m_DT.Columns.Count>1)
-                        {//by default, first column should not be needed to merge, so ignore it.
-                            //UpdateMergeCoordinate(currentRowNumber,colIndex);
-                            Tuple<int,int> ret= FindMergeRows(colIndex,currentRowNumber,newRow[colIndex]); // To find same value rowindex and row count.
-                            if(ret.Item2>1)
-                            {
-                                //when merged cell count >1, then it should be merged.
-                                //current cloumn from return row should be merged.
-                                string key=$"{colIndex}-{ret.Item1}";               
-                                if(m_MergeCells.ContainsKey(key))
-                                {
-                                    Tuple<int,int,int,int> originOne=m_MergeCells[key];
-                                    m_MergeCells[key]=new Tuple<int, int, int, int>(colIndex,ret.Item1,1,ret.Item2);
-                                }
-                                else
-                                {
-                                    m_MergeCells.Add(key,new Tuple<int, int, int, int>(colIndex,ret.Item1,1,ret.Item2));
-                                }
-                            }
-                        }
-                    
-
+                    {//by default, first column should not be needed to merge, so ignore it.
+                     //UpdateMergeCoordinate(currentRowNumber,colIndex);
+                        Tuple<int, int> ret = FindMergeRows(colIndex, currentRowNumber, newRow[colIndex]); // To find same value rowindex and row count.
+                        GenerateMergeCoordinate(colIndex, ret);
+                    }
+                }                
+            }
+        }
+        void GenerateMergeCoordinate(int colIndex, Tuple<int, int> ret)
+        {
+            if (ret.Item2 > 1)
+            {
+                //when merged cell count >1, then it should be merged.
+                string key = $"{colIndex}-{ret.Item1}";
+                if (m_MergeCells.ContainsKey(key))
+                {
+                    Tuple<int, int, int, int> originOne = m_MergeCells[key];
+                    m_MergeCells[key] = new Tuple<int, int, int, int>(colIndex, ret.Item1, 1, ret.Item2);
                 }
-                
+                else
+                {
+                    m_MergeCells.Add(key, new Tuple<int, int, int, int>(colIndex, ret.Item1, 1, ret.Item2));
+                }
             }
         }
         ///
@@ -169,21 +192,7 @@ namespace GenerateExcelLib
                 else if(currentRow==m_DT.Rows.Count-1)
                 {//current row is the last row, so it should find above all same value's rows for current column
                     Tuple<int,int> ret= FindMergeRows(colIndex,currentRow,value); // To find same value rowindex and row count.
-                    if(ret.Item2>1)
-                    {
-                        //when merged cell count >1, then it should be merged.
-                        //current cloumn from return row should be merged.
-                        string key=$"{colIndex}-{ret.Item1}";               
-                        if(m_MergeCells.ContainsKey(key))
-                        {
-                            Tuple<int,int,int,int> originOne=m_MergeCells[key];
-                            m_MergeCells[key]=new Tuple<int, int, int, int>(colIndex,ret.Item1,1,ret.Item2);
-                        }
-                        else
-                        {
-                            m_MergeCells.Add(key,new Tuple<int, int, int, int>(colIndex,ret.Item1,1,ret.Item2));
-                        }
-                    }
+                    GenerateMergeCoordinate(colIndex, ret);
                 }
             }
             

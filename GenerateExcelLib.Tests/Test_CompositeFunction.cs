@@ -241,7 +241,7 @@ namespace GenerateExcelLib.Tests
                                 GoogleMapLink = ""
                             }
                         },
-                        ForWhom = "PA Staff\nGRL",
+                        ForWhom = "Staff\nGL",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -266,7 +266,7 @@ namespace GenerateExcelLib.Tests
                                 GoogleMapLink = ""
                             }
                         },
-                        ForWhom = "PA Staff\nGRL",
+                        ForWhom = "Staff\nGL",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -291,7 +291,7 @@ namespace GenerateExcelLib.Tests
                                 GoogleMapLink = ""
                             }
                         },
-                        ForWhom = "PA Staff\nGRL",
+                        ForWhom = "Staff\nGL",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -316,7 +316,7 @@ namespace GenerateExcelLib.Tests
                                 GoogleMapLink = ""
                             }
                         },
-                        ForWhom = "PA Staff\nGRL",
+                        ForWhom = "Staff\nGL",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -341,7 +341,7 @@ namespace GenerateExcelLib.Tests
                                 GoogleMapLink = ""
                             }
                         },
-                        ForWhom = "PA Staff\nGRL",
+                        ForWhom = "Staff\nGL",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -366,7 +366,7 @@ namespace GenerateExcelLib.Tests
                                 GoogleMapLink = ""
                             }
                         },
-                        ForWhom = "PA Staff\nGRL",
+                        ForWhom = "Staff\nGL",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -391,7 +391,7 @@ namespace GenerateExcelLib.Tests
                                 GoogleMapLink = "",
                             }
                         },
-                        ForWhom = "PA Staff\nGRL",
+                        ForWhom = "Staff\nGL",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -413,10 +413,10 @@ namespace GenerateExcelLib.Tests
                             new Venues
                             {
                                 Venue = "Zone 4\nBLK 616\nLevel 3 Room 2",
-                                GoogleMapLink = "https://www.google.com/maps/place/singapore+poscode"
+                                GoogleMapLink = "https://www.google.com/maps/place/"
                             }
                         },
-                        ForWhom = "PA Staff\nGRL",
+                        ForWhom = "Staff\nGL",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -441,7 +441,7 @@ namespace GenerateExcelLib.Tests
                                 GoogleMapLink = ""
                             }
                         },
-                        ForWhom = "PA Staff\nGRL",
+                        ForWhom = "Staff\nGL",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
