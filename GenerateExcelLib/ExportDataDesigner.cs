@@ -7,6 +7,38 @@ using System.Collections.Generic;
 
 namespace GenerateExcelLib
 {
+    ///
+    /// define for merge identifier.
+    ///
+    public class MergeIdentifierAttribute:Attribute
+    {
+        ///
+        /// this Name will be set in rule dictionary, and used by merge follower obj.
+        ///
+        public string Name {get;set;}
+
+        public MergeIdentifierAttribute(string identifierName)
+        {
+            Name=identifierName;
+        }
+
+    }
+    ///
+    /// define for merge follower
+    ///
+    public class MergeFollowerAttribute:Attribute
+    {
+        ///
+        /// this Name will be set in rule dictionary, and used by merge follower obj.
+        ///
+        public string IdentifierName {get;set;}
+
+        public MergeFollowerAttribute(string identifierName)
+        {
+            this.IdentifierName=identifierName;
+        }
+
+    }
     /// reflection can know current what is current data type.
     enum StructType
     {
@@ -30,6 +62,13 @@ namespace GenerateExcelLib
         //The data which need to conver to DataTable, it's a generic type, you can define by yourself,
         //if you have array or collection type property in your data definition, please use List<T>. 
         private T Data;
+        ///
+        /// to record all col index and identifier name as a Key. merge follower could find extension content by identifier column index, then combine the content for comparing logic of merged cell.
+        /// one constrain is the identifier must be indicates on previous position than follower.
+        ///
+        private Dictionary<string,int> m_MergeIdentifiers=new Dictionary<string, int>();
+        private const string COlEXTENSION_Name="MergeIdentifier";
+
         public Dictionary<string,Tuple<int,int,int,int>> MergeCells{get{
             return m_MergeCells;
         }}
@@ -43,12 +82,14 @@ namespace GenerateExcelLib
             m_DT?.Dispose();
 
         }
-        private StructType WhichDataType(PropertyInfo propertyItem)
+        private StructType PreparePropertyInfo(PropertyInfo propertyItem)
         {
             var IsGenericType = propertyItem.PropertyType.IsGenericType;
             var IsBasicType= propertyItem.PropertyType.IsPrimitive || propertyItem.PropertyType.Equals(typeof(String)) || 
                             propertyItem.PropertyType.Equals(typeof(string)) || propertyItem.PropertyType.Equals(typeof(DateTime));
+
             var list = propertyItem.PropertyType.GetInterface("IEnumerable", false); //retrieve the collection object.
+
             if (IsGenericType && list != null) return StructType.GenericList;
             if (IsBasicType) 
                 return StructType.BasicType;
@@ -80,13 +121,14 @@ namespace GenerateExcelLib
             var newType = _data.GetType();
             foreach (var property_Item in newType.GetRuntimeProperties())
             { 
-                switch(WhichDataType(property_Item)){
+                switch(PreparePropertyInfo(property_Item)){
                     case StructType.BasicType:{
                         if(needAddCol)
                         {
-                            m_DT.Columns.Add(property_Item.Name,property_Item.PropertyType); //add column in Data table
+                            var newCol = m_DT.Columns.Add(property_Item.Name, property_Item.PropertyType); //add column in Data table
+                            ParseColumnAttribute(currentCol, property_Item, newCol);
                         }
-                        
+
                         var Value=property_Item.GetValue(_data); // add row value
                         row[currentCol]= Value;    //set current cell's value
                         CopyValuetoBelowRows_ForOneCol(currentCol,currentRowNum,Value);//copy current column's value to all below rows.
@@ -121,6 +163,24 @@ namespace GenerateExcelLib
             }
             return currentCol; //return the next column index number.
         }
+
+        private void ParseColumnAttribute(int currentCol, PropertyInfo property_Item, DataColumn newCol)
+        {
+            var identifierCol = property_Item.GetCustomAttribute<MergeIdentifierAttribute>();
+            if (identifierCol != null)
+            {//set merge identifier collection.
+                if (m_MergeIdentifiers.ContainsKey(identifierCol.Name))
+                    m_MergeIdentifiers[identifierCol.Name] = currentCol;
+                else
+                    m_MergeIdentifiers.Add(identifierCol.Name, currentCol);
+            }
+            var followerCol = property_Item.GetCustomAttribute<MergeFollowerAttribute>();
+            if (followerCol != null)
+            {
+                newCol.ExtendedProperties.Add(COlEXTENSION_Name, followerCol.IdentifierName);
+            }
+        }
+
         ///
         /// only copy the latest row's data to curren row.
         ///
@@ -153,7 +213,6 @@ namespace GenerateExcelLib
                 string key = $"{colIndex}-{ret.Item1}";
                 if (m_MergeCells.ContainsKey(key))
                 {
-                    Tuple<int, int, int, int> originOne = m_MergeCells[key];
                     m_MergeCells[key] = new Tuple<int, int, int, int>(colIndex, ret.Item1, 1, ret.Item2);
                 }
                 else
@@ -172,22 +231,57 @@ namespace GenerateExcelLib
             if(m_DT.Rows.Count>1)
             {
                 if(currentRow<m_DT.Rows.Count-1)
-                {// copy all value for entire column
+                {// copy all value from current row to the end of table
+                    int mergeCount=1;
+                    int merge_StartRow=currentRow;
+                    //if current column is follower, then find identify column number for the follower column
+                    string identifier_Key=m_DT.Columns[colIndex].ExtendedProperties.ContainsKey(COlEXTENSION_Name)?m_DT.Columns[colIndex].ExtendedProperties[COlEXTENSION_Name].ToString():string.Empty;
+                    int identtifier_ColNum=m_MergeIdentifiers.ContainsKey(identifier_Key)?m_MergeIdentifiers[identifier_Key]:-1;
+                    string Prefix_currentContent=string.Empty;
+                    string currentValue=string.Empty;
+                    if(identtifier_ColNum>-1)
+                    {
+                        Prefix_currentContent= m_DT.Rows[currentRow][identtifier_ColNum].ToString();
+                    }
+                    currentValue=$"{Prefix_currentContent}-{value?.ToString()}";
                     for(int rowNum=currentRow+1;rowNum<m_DT.Rows.Count;rowNum++)
                     {
                         m_DT.Rows[rowNum][colIndex]=value; //set value on all rows but same column.
+                        //combine relevant value from required other cell in same row. then compare final content if it's same
+                        string Prefix_comparedContent=string.Empty;
+                        if(identtifier_ColNum>-1)
+                        {
+                            Prefix_comparedContent=m_DT.Rows[rowNum][identtifier_ColNum].ToString();
+                        }                 
+                        string ComparedValue=$"{Prefix_comparedContent}-{value?.ToString()}";
+
+                        if(currentValue.Equals(ComparedValue))//compare is true
+                        {                            
+                            mergeCount++;
+                            if(mergeCount>1)
+                            {
+                                GenerateMergeCoordinate(colIndex,new Tuple<int, int>(merge_StartRow,mergeCount));
+                            }
+                        }
+                        else
+                        {
+                            mergeCount=1;
+                            merge_StartRow=rowNum;
+                            currentValue=ComparedValue;
+                        }
+
                     }
-                    //current cloumn from row 0 should be merged.
-                    string key=$"{colIndex}-{currentRow}";               
-                    if(m_MergeCells.ContainsKey(key))
-                    {
-                        Tuple<int,int,int,int> originOne=m_MergeCells[key];
-                        m_MergeCells[key]=new Tuple<int, int, int, int>(colIndex,currentRow,1,m_DT.Rows.Count-currentRow);
-                    }
-                    else
-                    {
-                        m_MergeCells.Add(key,new Tuple<int, int, int, int>(colIndex,currentRow,1,m_DT.Rows.Count-currentRow));
-                    }
+                    //
+
+                    // string key=$"{colIndex}-{currentRow}";               
+                    // if(m_MergeCells.ContainsKey(key))
+                    // {
+                    //     m_MergeCells[key]=new Tuple<int, int, int, int>(colIndex,currentRow,1,m_DT.Rows.Count-currentRow);
+                    // }
+                    // else
+                    // {
+                    //     m_MergeCells.Add(key,new Tuple<int, int, int, int>(colIndex,currentRow,1,m_DT.Rows.Count-currentRow));
+                    // }
                 }
                 else if(currentRow==m_DT.Rows.Count-1)
                 {//current row is the last row, so it should find above all same value's rows for current column
@@ -204,9 +298,27 @@ namespace GenerateExcelLib
         {
             int startRow=currentRow;
             int mergeCount=1;
+            //if current column is follower, then find identify column number for the follower column
+            string identifier_Key=m_DT.Columns[colIndex].ExtendedProperties.ContainsKey(COlEXTENSION_Name)?m_DT.Columns[colIndex].ExtendedProperties[COlEXTENSION_Name].ToString():string.Empty;
+            int identtifier_ColNum=m_MergeIdentifiers.ContainsKey(identifier_Key)?m_MergeIdentifiers[identifier_Key]:-1;
+            string Prefix_currentContent=string.Empty;
+            string currentValue=string.Empty;
+            if(identtifier_ColNum>-1)
+            {
+                Prefix_currentContent= m_DT.Rows[currentRow][identtifier_ColNum].ToString();
+            }
+            currentValue=$"{Prefix_currentContent}-{value?.ToString()}";
             for(int rowIndex=currentRow-1;rowIndex>=0;rowIndex--)
             {
-                if(m_DT.Rows[rowIndex][colIndex].ToString().Equals(value?.ToString()))
+                //combine relevant value from required other cell in same row. then compare final content if it's same
+                string Prefix_comparedContent=string.Empty;
+                if(identtifier_ColNum>-1)
+                {
+                    Prefix_comparedContent=m_DT.Rows[rowIndex][identtifier_ColNum].ToString();
+                }                 
+                string ComparedValue=$"{Prefix_comparedContent}-{m_DT.Rows[rowIndex][colIndex].ToString()}";
+                //
+                if(currentValue.Equals(ComparedValue))
                 {
                     startRow=rowIndex;
                     mergeCount++;
