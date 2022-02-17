@@ -135,7 +135,10 @@ namespace GenerateExcelLib
             if (identifierCol != null)
             {//set merge identifier collection.
                 m_MergeIdentifiers.Add(identifierCol.Name, currentCol);
-                m_HiddenCols.Add(currentCol);
+                if(identifierCol.IsHidden)
+                {
+                    m_HiddenCols.Add(currentCol);
+                }
                 
             }
             var followerCol = property_Item.GetCustomAttribute<MergeFollowerAttribute>();

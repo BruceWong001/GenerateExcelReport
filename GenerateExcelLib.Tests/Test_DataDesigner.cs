@@ -447,6 +447,7 @@ namespace GenerateExcelLib.Tests
         }
         class ClassInfo
         {
+            [MergeIdentifier("No USe")]
             public string ClassCode{get;set;}
             public string ClassName{get;set;}
             public List<SessionTime> SessionInfo{get;set;}
@@ -502,8 +503,9 @@ namespace GenerateExcelLib.Tests
                 DataTable table=designer.GeneratDataTable();
                 Dictionary<string,Tuple<int,int,int,int>> mergeCells=designer.MergeCells;
                 // Then
-                Assert.Equal(3,designer.HiddenCols[0]);
+                
                 Assert.Equal(1,designer.HiddenCols.Count);
+                Assert.Equal(3,designer.HiddenCols[0]);
             }
 
         }
