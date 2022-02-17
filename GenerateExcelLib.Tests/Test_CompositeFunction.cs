@@ -238,11 +238,16 @@ namespace GenerateExcelLib.Tests
                         {
                             new Venues
                             {
-                                Venue = "Learning Lounge",
+                                Venue = "Learning Lounge 1",
+                                GoogleMapLink = ""
+                            },
+                            new Venues
+                            {
+                                Venue = "Learning Lounge 2",
                                 GoogleMapLink = ""
                             }
                         },
-                        ForWhom = "Staff\nGL",
+                        ForWhom = "",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -264,11 +269,11 @@ namespace GenerateExcelLib.Tests
                         {
                             new Venues
                             {
-                                Venue = "Learning Lounge",
+                                Venue = "Learning Lounge 1",
                                 GoogleMapLink = ""
                             }
                         },
-                        ForWhom = "Staff\nGL",
+                        ForWhom = "",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -290,11 +295,16 @@ namespace GenerateExcelLib.Tests
                         {
                             new Venues
                             {
-                                Venue = "Learning Lounge",
+                                Venue = "Learning Lounge 3",
+                                GoogleMapLink = ""
+                            },
+                            new Venues
+                            {
+                                Venue = "Learning Lounge 4",
                                 GoogleMapLink = ""
                             }
                         },
-                        ForWhom = "Staff\nGL",
+                        ForWhom = "",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -318,9 +328,14 @@ namespace GenerateExcelLib.Tests
                             {
                                 Venue = "Learning Lounge",
                                 GoogleMapLink = ""
-                            }
+                            },
+                            new Venues
+                            {
+                                Venue = "Learning Lounge 1",
+                                GoogleMapLink = ""
+                            }                            
                         },
-                        ForWhom = "Staff\nGL",
+                        ForWhom = "",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -344,9 +359,14 @@ namespace GenerateExcelLib.Tests
                             {
                                 Venue = "Learning Lounge",
                                 GoogleMapLink = ""
+                            },
+                            new Venues
+                            {
+                                Venue = "Learning Lounge 1",
+                                GoogleMapLink = ""
                             }
                         },
-                        ForWhom = "Staff\nGL",
+                        ForWhom = "",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -372,7 +392,7 @@ namespace GenerateExcelLib.Tests
                                 GoogleMapLink = ""
                             }
                         },
-                        ForWhom = "Staff\nGL",
+                        ForWhom = "",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -396,9 +416,14 @@ namespace GenerateExcelLib.Tests
                             {
                                 Venue = "Learning Lounge",
                                 GoogleMapLink = "",
+                            },
+                            new Venues
+                            {
+                                Venue = "Learning Lounge 5",
+                                GoogleMapLink = "",
                             }
                         },
-                        ForWhom = "Staff\nGL",
+                        ForWhom = "",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -424,7 +449,7 @@ namespace GenerateExcelLib.Tests
                                 GoogleMapLink = "https://www.google.com/maps/place/"
                             }
                         },
-                        ForWhom = "Staff\nGL",
+                        ForWhom = "",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -450,7 +475,7 @@ namespace GenerateExcelLib.Tests
                                 GoogleMapLink = ""
                             }
                         },
-                        ForWhom = "Staff\nGL",
+                        ForWhom = "",
                         NoofPax = "",
                         VDincharge = "",
                         StakeHolders = new StakeHolders
@@ -475,13 +500,13 @@ namespace GenerateExcelLib.Tests
             //When: run test function
             work_book.MergeCell(Result_Book, designer.MergeCells);
 
-            using MemoryStream ms = new(new byte[5000000]);
+            using MemoryStream ms = new MemoryStream(new byte[5000000]);
             //save excel file content into tempfile(memory stream)
             Result_Book.Save(ms, SaveFormat.Xlsx);
-           // Result_Book.Save(@"c:\test.xlsx"); // only for debug
+            Result_Book.Save(@"c:\test.xlsx"); // only for debug
                                                // first col (one based),first row (one based), total cols(one based), total rows(one based)
                                                //Then: Assert result
-            Assert.Equal(21, designer.MergeCells.Count);
+            Assert.Equal(50, designer.MergeCells.Count);
             // Assert.Equal(new Tuple<int, int, int, int>(3, 6, 1, 2), designer.MergeCells["3-6"]);
             // Assert.Equal(new Tuple<int, int, int, int>(4, 6, 1, 2), designer.MergeCells["4-6"]);
             // Assert.Equal(new Tuple<int, int, int, int>(5, 6, 1, 2), designer.MergeCells["5-6"]);

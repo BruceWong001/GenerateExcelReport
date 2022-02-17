@@ -278,6 +278,53 @@ namespace GenerateExcelLib.Tests
             }
 
         }  
+        [Fact]
+        [Trait("Category","MergedCells")]
+        public void ValidateMergeCellCount_AtMiddle_OverlapRegion()
+        {
+            // Given
+            ListMiddle data=new ListMiddle(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
+                       Sessions= new List<SessionTime2Elements>{new SessionTime2Elements{Session=DateTime.Now, Address="aaa", Learners=new List<Learner>{new Learner{Name="Bruce",Age=20},new Learner{Name="Lily",Age=19}}},
+                       new SessionTime2Elements{Session=DateTime.Now.AddDays(1),Address="aaa",Learners=new List<Learner>{new Learner{Name="Joe",Age=29},new Learner{Name="Andy",Age=18}}},
+                       new SessionTime2Elements{Session=DateTime.Now.AddDays(2),Address="aaa",Learners=new List<Learner>{new Learner{Name="Nancy",Age=20}}}
+                       }};
+           
+            // When
+            using(var designer=new ExportDataDesigner<ListMiddle>(data))
+            {
+                DataTable table=designer.GeneratDataTable();
+            // Then
+                Assert.Equal<int>(6, designer.MergeCells.Count);
+            }
+
+        }  
+        [Fact]
+        [Trait("Category","MergedCells")]
+        public void ValidateMergeCellContent_AtMiddle_OverlapRegion()
+        {
+            // Given
+            ListMiddle data=new ListMiddle(){ClassTitle="Java",ClassCode="10010",Trainer="Bill",
+                       Sessions= new List<SessionTime2Elements>{new SessionTime2Elements{Session=DateTime.Now, Address="aaa", Learners=new List<Learner>{new Learner{Name="Bruce",Age=20},new Learner{Name="Lily",Age=19}}},
+                       new SessionTime2Elements{Session=DateTime.Now.AddDays(1),Address="aaa",Learners=new List<Learner>{new Learner{Name="Joe",Age=29},new Learner{Name="Andy",Age=18}}},
+                       new SessionTime2Elements{Session=DateTime.Now.AddDays(2),Address="aaa",Learners=new List<Learner>{new Learner{Name="Nancy",Age=20}}}
+                       }};
+           
+            // When
+            using(var designer=new ExportDataDesigner<ListMiddle>(data))
+            {
+                DataTable table=designer.GeneratDataTable();
+                var mergeCells=designer.MergeCells;
+            // Then
+                Assert.Equal<int>(6, mergeCells.Count);                
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(0,0,1,5),mergeCells["0-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(1,0,1,5),mergeCells["1-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(2,0,1,2),mergeCells["2-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(2,2,1,2),mergeCells["2-2"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(5,0,1,5),mergeCells["5-0"]);
+                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(6,0,1,5),mergeCells["6-0"]);
+            }
+
+        } 
         class SessionObj
         {
             public DateTime Session {get;set;}
@@ -460,6 +507,7 @@ namespace GenerateExcelLib.Tests
             }
 
         }
+
 
     }
 }

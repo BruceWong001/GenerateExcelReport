@@ -151,7 +151,7 @@ namespace GenerateExcelLib
         private void CopyRowValuefromAboveRow(int currentColNumber,int currentRowNumber,DataRow newRow,DataRow oldRow)
         {
             int rowCount=m_DT.Rows.Count;
-            if(rowCount>1 && oldRow is not null)
+            if(rowCount>1 && oldRow !=null)
             {
                 //only handle there is existing data.
                 for(int colIndex=0;colIndex<currentColNumber;colIndex++)//m_DT.Columns.Count
@@ -161,11 +161,11 @@ namespace GenerateExcelLib
                         // copy row means all columns in row should be merged from beginning.
                         //the currentColNumber records when trigger the copy event. it means, before this column all copy the cells should be merged.
                         if(m_DT.Columns.Count>1)
-                    {//by default, first column should not be needed to merge, so ignore it.
-                     //UpdateMergeCoordinate(currentRowNumber,colIndex);
-                        Tuple<int, int> ret = FindMergeRows(colIndex, currentRowNumber, newRow[colIndex]); // To find same value rowindex and row count.
-                        GenerateMergeCoordinate(colIndex, ret);
-                    }
+                        {//by default, first column should not be needed to merge, so ignore it.
+                        //UpdateMergeCoordinate(currentRowNumber,colIndex);
+                            Tuple<int, int> ret = FindMergeRows(colIndex, currentRowNumber, newRow[colIndex]); // To find same value rowindex and row count.
+                            GenerateMergeCoordinate(colIndex, ret);
+                        }
                 }                
             }
         }
@@ -196,56 +196,28 @@ namespace GenerateExcelLib
             {
                 if(currentRow<m_DT.Rows.Count-1)
                 {// copy all value from current row to the end of table
-                    int mergeCount=1;
-                    int merge_StartRow=currentRow;
-                    //if current column is follower, then find identify column number for the follower column
-                    string identifier_Key=m_DT.Columns[colIndex].ExtendedProperties.ContainsKey(COlEXTENSION_Name)?m_DT.Columns[colIndex].ExtendedProperties[COlEXTENSION_Name].ToString():string.Empty;
-                    int identtifier_ColNum=m_MergeIdentifiers.ContainsKey(identifier_Key)?m_MergeIdentifiers[identifier_Key]:-1;
-                    string Prefix_currentContent=string.Empty;
-                    string currentValue=string.Empty;
-                    if(identtifier_ColNum>-1)
-                    {
-                        Prefix_currentContent= m_DT.Rows[currentRow][identtifier_ColNum].ToString();
-                    }
-                    currentValue=$"{Prefix_currentContent}-{value?.ToString()}";
                     for(int rowNum=currentRow+1;rowNum<m_DT.Rows.Count;rowNum++)
                     {
                         m_DT.Rows[rowNum][colIndex]=value; //set value on all rows but same column.
-                        //combine relevant value from required other cell in same row. then compare final content if it's same
-                        string Prefix_comparedContent=string.Empty;
-                        if(identtifier_ColNum>-1)
-                        {
-                            Prefix_comparedContent=m_DT.Rows[rowNum][identtifier_ColNum].ToString();
-                        }                 
-                        string ComparedValue=$"{Prefix_comparedContent}-{value?.ToString()}";
-
-                        if(currentValue.Equals(ComparedValue))//compare is true
-                        {                            
-                            mergeCount++;
-                            if(mergeCount>1)
-                            {
-                                GenerateMergeCoordinate(colIndex,new Tuple<int, int>(merge_StartRow,mergeCount));
-                            }
-                        }
-                        else
-                        {
-                            mergeCount=1;
-                            merge_StartRow=rowNum;
-                            currentValue=ComparedValue;
-                        }
 
                     }
+
                 }
-                else if(currentRow==m_DT.Rows.Count-1)
-                {//current row is the last row, so it should find above all same value's rows for current column
-                    Tuple<int,int> ret= FindMergeRows(colIndex,currentRow,value); // To find same value rowindex and row count.
+
+                // after copy corrent column values, generate merge cell from bottom to above.
+                var rowNumRecord=m_DT.Rows.Count-1;
+                while(rowNumRecord>0)
+                {
+                    Tuple<int,int> ret= FindMergeRows(colIndex,rowNumRecord,m_DT.Rows[rowNumRecord][colIndex]); // To find same value rowindex and row count.
                     GenerateMergeCoordinate(colIndex, ret);
+                    rowNumRecord-=ret.Item2;
                 }
+
             }
             
         }
         ///
-        /// fine merge cells and return start row number. the condition is for certain column.
+        /// find merge cells from currentRow to above all and return start row number until first non-equel.
         ///
         private Tuple<int, int> FindMergeRows(int colIndex, int currentRow, object value)
         {
@@ -275,9 +247,16 @@ namespace GenerateExcelLib
                 {
                     startRow=rowIndex;
                     mergeCount++;
+                    string key=$"{colIndex}-{startRow}"; //generate current possible merged cell coordinate.
+                    if(m_MergeCells.ContainsKey(key))
+                    {//if there is same key in mergecells, it means there is a overlap area. so we need to remove the key first. 
+                        m_MergeCells.Remove(key);
+                    }
                 }
                 else
+                {
                     break;
+                }
                 
             }
             
