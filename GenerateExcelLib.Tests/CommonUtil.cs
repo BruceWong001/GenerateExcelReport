@@ -30,6 +30,9 @@ namespace GenerateExcelLib.Tests
         
             
         }
+        ///
+        /// the col and row are based on one
+        ///
         public static string Retrieve_Content_CertainCell(Stream _stream, int Col,int Row )
         {
             if(_stream!=null)
@@ -50,6 +53,9 @@ namespace GenerateExcelLib.Tests
             }
 
         }
+        ///
+        /// row and col are based on one
+        ///
         public static Boolean Is_MergeCell(Stream _stream, int startCol,int startRow,int totalCols,int totalRows )
         {
             if(_stream!=null)

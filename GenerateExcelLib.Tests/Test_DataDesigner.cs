@@ -4,31 +4,29 @@ using System.IO;
 using System.Data;
 using System.Collections.Generic;
 using GenerateExcelLib;
-using Aspose.Cells;
-
 
 namespace GenerateExcelLib.Tests
-{
-    public class Learner
-    {
-        public string Name{get;set;}
-        public int Age {get;set;}
-    }
-    class SessionTime
-    {
-        public DateTime Session{get;set;}
-        [MergeIdentifier("SessionName",true)]
-        public string SessionName{get;set;}
-    }
-    class SessionTime2Elements
-    {
-        public DateTime Session{get;set;}
-        public List<Learner> Learners{get;set;}
-        public string Address{get;set;}
-    }
+{    
 
     public class Test_ExportDataDesigner
     {
+        class Learner
+        {
+            public string Name{get;set;}
+            public int Age {get;set;}
+        }
+        class SessionTime
+        {
+            public DateTime Session{get;set;}
+            [MergeIdentifier("SessionName",true)]
+            public string SessionName{get;set;}
+        }
+        class SessionTime2Elements
+        {
+            public DateTime Session{get;set;}
+            public List<Learner> Learners{get;set;}
+            public string Address{get;set;}
+        }        
         class SimpleClass
         {
             public string ClassTitle{get;set;}
@@ -447,7 +445,6 @@ namespace GenerateExcelLib.Tests
         }
         class ClassInfo
         {
-            [MergeIdentifier("No USe")]
             public string ClassCode{get;set;}
             public string ClassName{get;set;}
             public List<SessionTime> SessionInfo{get;set;}
@@ -503,9 +500,8 @@ namespace GenerateExcelLib.Tests
                 DataTable table=designer.GeneratDataTable();
                 Dictionary<string,Tuple<int,int,int,int>> mergeCells=designer.MergeCells;
                 // Then
-                
-                Assert.Equal(1,designer.HiddenCols.Count);
                 Assert.Equal(3,designer.HiddenCols[0]);
+                Assert.Equal(1,designer.HiddenCols.Count);
             }
 
         }

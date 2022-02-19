@@ -4,13 +4,16 @@ using System.IO;
 using System.Data;
 using System.Collections.Generic;
 using GenerateExcelLib;
-using Aspose.Cells;
-
 
 namespace GenerateExcelLib.Tests
 {
     public class Test_CompositeFunction
     {
+        class Learner
+        {
+            public string Name{get;set;}
+            public int Age {get;set;}
+        }
         class SessionObj
         {
             public DateTime Session {get;set;}
@@ -41,21 +44,24 @@ namespace GenerateExcelLib.Tests
                 //generate datatable
                 using(DataTable mydata=designer.GeneratDataTable())
                 {
-                    var work_book=new ExportRegularExcel();
+                    //using FileStream ms=new FileStream(@"c:\testnew.xlsx",FileMode.Create);
+                    using MemoryStream ms=new MemoryStream();
+                    ExportRegularExcel work_book=new ExportRegularExcel(ms);
+                    DrawParameter parameter=new DrawParameter{
+                        StartRow=1,StartCol=1,
+                        MergeCells=designer.MergeCells,
+                        HiddenColumns=designer.HiddenCols
+                    };
                     // When run test function
-                    var Result_Book= work_book.GenerateExcel(mydata);
-    
-                    using(MemoryStream ms=new MemoryStream(new byte[5000000]))
-                    {
-                        //save excel file content into tempfile(memory stream)
-                        Result_Book.Save(ms,SaveFormat.Xlsx);
-                       // Result_Book.Save(@"c:\test.xlsx"); // only for debug
+
+                        work_book.DrawExcel(mydata,parameter,true);
+                        work_book.Save();
                         //Then Assert result
                         var result=Excel_Ops_Aspose.Retrieve_Num_Column_Row(ms);
                         Assert.Equal(7,result.Item1); //assert column num
                         Assert.Equal(4,result.Item2); //assert row num
 
-                        }
+                        
                     
                 }
             }
@@ -63,7 +69,7 @@ namespace GenerateExcelLib.Tests
         } 
         [Fact]
         [Trait("Category","Assemble")]
-        public void Export_ComplexContentObject_WithNoHead()
+        public void Export_ComplexContentObject_from5Row_WithNoHead()
         {
             // Given
 
@@ -73,21 +79,22 @@ namespace GenerateExcelLib.Tests
                 //generate datatable
                 using(DataTable mydata=designer.GeneratDataTable())
                 {
-                    var work_book=new ExportRegularExcel();
+                    using FileStream ms=new FileStream(@"c:\testnew.xlsx",FileMode.Create);
+                    //using MemoryStream ms=new MemoryStream();
+                    ExportRegularExcel work_book=new ExportRegularExcel(ms);
+                    DrawParameter parameter=new DrawParameter{
+                        StartRow=5,StartCol=1,
+                        MergeCells=designer.MergeCells,
+                        HiddenColumns=designer.HiddenCols
+                    };
                     // When run test function
-                    var Result_Book= work_book.GenerateExcel(mydata,5,false);
-    
-                    using(MemoryStream ms=new MemoryStream(new byte[5000000]))
-                    {
-                        //save excel file content into tempfile(memory stream)
-                        Result_Book.Save(ms,SaveFormat.Xlsx);
-                    // Result_Book.Save(@"c:\test.xlsx"); // only for debug
+
+                    work_book.DrawExcel(mydata,parameter,false);
+                    work_book.Save();
                         //Then Assert result
                         var result=Excel_Ops_Aspose.Retrieve_Num_Column_Row(ms);
                         Assert.Equal(7,result.Item1); //assert column num
                         Assert.Equal(7,result.Item2); //assert row num
-
-                        }
                     
                 }
             }
@@ -105,29 +112,29 @@ namespace GenerateExcelLib.Tests
                 //Given: generate datatable
                 using(DataTable mydata=designer.GeneratDataTable())
                 {
-                    var work_book=new ExportRegularExcel();
-                    
-                    using(var Result_Book= work_book.GenerateExcel(mydata))
-                    {
+                    //using FileStream ms=new FileStream(@"c:\testnew.xlsx",FileMode.Create);
+                    using MemoryStream ms=new MemoryStream();
+                    ExportRegularExcel work_book=new ExportRegularExcel(ms);
+                    DrawParameter parameter=new DrawParameter{
+                        StartRow=1,StartCol=1,
+                        MergeCells=designer.MergeCells,
+                        HiddenColumns=designer.HiddenCols
+                    };
+
                         //When: run test function
-                        work_book.MergeCell(Result_Book,designer.MergeCells); 
-                    
-                        using(MemoryStream ms=new MemoryStream(new byte[5000000]))
-                        {
-                            //save excel file content into tempfile(memory stream)
-                            Result_Book.Save(ms,SaveFormat.Xlsx);
-                          //  Result_Book.Save(@"c:\test.xlsx"); // only for debug
+                        work_book.DrawExcel(mydata,parameter,true);
+                        work_book.Save();
                           // first col (one based),first row (one based), total cols(one based), total rows(one based)
                             //Then: Assert result
-                            Assert.Equal<int>(5,designer.MergeCells.Count);
-                            Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,1,2,1,3)); //assert the spicified area is merged.
-                            Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,2,2,1,3));
-                            Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,3,2,1,3));
-                            Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,4,2,1,2));
-                            Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,5,2,1,2));
-                        }
+                        Assert.Equal<int>(5,designer.MergeCells.Count);
+                        Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,1,2,1,3)); //assert the spicified area is merged.
+                        Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,2,2,1,3));
+                        Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,3,2,1,3));
+                        Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,4,2,1,2));
+                        Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,5,2,1,2));
+                        
                     
-                    }
+                    
                 }
             }
             
@@ -148,18 +155,18 @@ namespace GenerateExcelLib.Tests
                 //Given: generate datatable
                 using(DataTable mydata=designer.GeneratDataTable())
                 {
-                    var work_book=new ExportRegularExcel();
-                    
-                    using(var Result_Book= work_book.GenerateExcel(mydata))
-                    {
-                        //When: run test function
-                        work_book.MergeCell(Result_Book,designer.MergeCells); 
-                    
-                        using(MemoryStream ms=new MemoryStream(new byte[5000000]))
-                        {
-                            //save excel file content into tempfile(memory stream)
-                            Result_Book.Save(ms,SaveFormat.Xlsx);
-                          //  Result_Book.Save(@"c:\test.xlsx"); // only for debug
+                    //using FileStream ms=new FileStream(@"c:\testnew.xlsx",FileMode.Create);
+                    using MemoryStream ms=new MemoryStream();
+                    ExportRegularExcel work_book=new ExportRegularExcel(ms);
+                    DrawParameter parameter=new DrawParameter{
+                        StartRow=1,StartCol=1,
+                        MergeCells=designer.MergeCells,
+                        HiddenColumns=designer.HiddenCols
+                    };                      
+                      //When: run test function
+                        work_book.DrawExcel(mydata,parameter,true);
+                        work_book.Save();                   
+
                           // first col (one based),first row (one based), total cols(one based), total rows(one based)
                             //Then: Assert result
                             Assert.Equal<int>(7,designer.MergeCells.Count);
@@ -170,9 +177,9 @@ namespace GenerateExcelLib.Tests
                            Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,4,4,1,2));
                            Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,5,2,1,2));
                            Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,5,4,1,2));
-                        }
+                        
                     
-                    }
+                    
                 }
             }
             
@@ -188,18 +195,17 @@ namespace GenerateExcelLib.Tests
                 //Given: generate datatable
                 using(DataTable mydata=designer.GeneratDataTable())
                 {
-                    var work_book=new ExportRegularExcel();
+                    //using FileStream ms=new FileStream(@"c:\testnew.xlsx",FileMode.Create);
+                    using MemoryStream ms=new MemoryStream();
+                    ExportRegularExcel work_book=new ExportRegularExcel(ms);
+                    DrawParameter parameter=new DrawParameter{
+                        StartRow=1,StartCol=1,
+                        MergeCells=designer.MergeCells,
+                        HiddenColumns=designer.HiddenCols
+                    };
                     
-                    using(var Result_Book= work_book.GenerateExcel(mydata,1,false))
-                    {
-                        //When: run test function
-                        work_book.MergeCell(Result_Book,designer.MergeCells,false); 
-                    
-                        using(MemoryStream ms=new MemoryStream(new byte[5000000]))
-                        {
-                            //save excel file content into tempfile(memory stream)
-                            Result_Book.Save(ms,SaveFormat.Xlsx);
-                           // Result_Book.Save(@"c:\test.xlsx"); // only for debug
+                        work_book.DrawExcel(mydata,parameter,false);
+                        work_book.Save();
                           // first col (one based),first row (one based), total cols(one based), total rows(one based)
                             //Then: Assert result
                             Assert.Equal<int>(5,designer.MergeCells.Count);
@@ -208,9 +214,9 @@ namespace GenerateExcelLib.Tests
                             Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,3,1,1,3));
                             Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,4,1,1,2));
                             Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,5,1,1,2));
-                        }
+                        
                     
-                    }
+                    
                 }
             }
             
@@ -494,18 +500,18 @@ namespace GenerateExcelLib.Tests
 
             //Given: generate datatable
             using DataTable mydata = designer.GeneratDataTable();
-            var work_book = new ExportRegularExcel();
+            //using FileStream ms=new FileStream(@"c:\testnew.xlsx",FileMode.Create);
+            using MemoryStream ms=new MemoryStream();
+            ExportRegularExcel work_book=new ExportRegularExcel(ms);
+            DrawParameter parameter=new DrawParameter{
+                StartRow=1,StartCol=1,
+                MergeCells=designer.MergeCells,
+                HiddenColumns=designer.HiddenCols
+            };
 
-            using var Result_Book = work_book.GenerateExcel(mydata);
-            //When: run test function
-            work_book.MergeCell(Result_Book, designer.MergeCells);
 
-            using MemoryStream ms = new MemoryStream(new byte[5000000]);
-            //save excel file content into tempfile(memory stream)
-            Result_Book.Save(ms, SaveFormat.Xlsx);
-            Result_Book.Save(@"c:\test.xlsx"); // only for debug
-                                               // first col (one based),first row (one based), total cols(one based), total rows(one based)
-                                               //Then: Assert result
+            work_book.DrawExcel(mydata,parameter,true);
+            work_book.Save();
             Assert.Equal(50, designer.MergeCells.Count);
             // Assert.Equal(new Tuple<int, int, int, int>(3, 6, 1, 2), designer.MergeCells["3-6"]);
             // Assert.Equal(new Tuple<int, int, int, int>(4, 6, 1, 2), designer.MergeCells["4-6"]);
