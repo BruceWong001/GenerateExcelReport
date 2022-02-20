@@ -16,15 +16,9 @@ namespace GenerateExcelLib
         private DrawParameter m_DrawParameter;
         public ExportRegularExcelClosedXML(Stream stream)
         {
-            try
-            {
                 m_IOStream=stream;
                 m_workBook= new XLWorkbook();           
-            }
-            catch(Exception ex)
-            {
-                throw new InvalidDataException("The IO Stream is invalidate, so it cannot create a Workbook",ex);
-            }
+
             
         }
         ~ExportRegularExcelClosedXML()
@@ -85,10 +79,19 @@ namespace GenerateExcelLib
         {
             throw new NotImplementedException();
         }
-
+        ///
+        /// ClosedXML save uses save as
+        ///
         public void Save()
         {
-            m_workBook.SaveAs(m_IOStream);
+            try
+            {
+                m_workBook.SaveAs(m_IOStream);
+            }
+            catch(Exception ex)
+            {
+                throw new InvalidDataException("The IO Stream is invalidate, so it cannot create a Workbook",ex);
+            }
         }
     }
 }
