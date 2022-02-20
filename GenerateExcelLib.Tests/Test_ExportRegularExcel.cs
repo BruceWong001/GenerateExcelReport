@@ -493,7 +493,8 @@ namespace GenerateExcelLib.Tests
                     #region  DataTable 2
                     var parameter2=new DrawParameter{
                         MergeCells=new Dictionary<string, Tuple<int, int, int, int>>{
-                            {"1-0",new Tuple<int, int, int, int>(1,1,1,2)}
+                            {"0-0",new Tuple<int, int, int, int>(0,0,1,2)},
+                            {"2-1",new Tuple<int, int, int, int>(2,1,1,2)}
                         }
                     } ;
                     //Act: run test function
@@ -503,7 +504,8 @@ namespace GenerateExcelLib.Tests
                     work_book.Save();
                     //Assert: result
                     Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,2,3,1,2));
-                    Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,2,6,1,2));
+                    Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,1,5,1,2));
+                    Assert.True(Excel_Ops_Aspose.Is_MergeCell(ms,3,6,1,2));
 
                 } 
             }
