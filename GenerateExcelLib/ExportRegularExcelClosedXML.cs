@@ -18,8 +18,6 @@ namespace GenerateExcelLib
         {
                 m_IOStream=stream;
                 m_workBook= new XLWorkbook();           
-
-            
         }
         ~ExportRegularExcelClosedXML()
         {

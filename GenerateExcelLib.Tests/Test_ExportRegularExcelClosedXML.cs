@@ -28,8 +28,6 @@ namespace GenerateExcelLib.Tests
             // release resource if you use them during test.
         }
 
- //////////////////////////////       
-
         [Fact]
         [Trait("Category","ClosedXML")]
         public void Export_OneDataTable_withHead()
@@ -52,6 +50,33 @@ namespace GenerateExcelLib.Tests
                 } 
             }
         }
+
+        [Fact]
+        [Trait("Category","ClosedXML")]
+        public void Export_OneDataTable_withNoHead()
+        {
+            using(DataTable mydata=Initial_Simple_DataTable())
+            {
+               // using(FileStream ms=new FileStream(@"c:\testnew.xlsx",FileMode.Create))
+                using(MemoryStream ms=new MemoryStream())
+                {
+                    var work_book=new ExportRegularExcelClosedXML(ms);
+                    //Act: run test function
+                    work_book.DrawExcel(mydata,false);
+                    work_book.Save();
+                    //Assert: result
+                    var result=Excel_Ops_Aspose.Retrieve_Num_Column_Row(ms);
+                    Assert.Equal(3,result.Item1);
+                    Assert.Equal(3,result.Item2);
+
+                }
+            }             
+        }
+
+
+
+
+
     }
 
 }
