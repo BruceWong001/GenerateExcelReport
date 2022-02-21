@@ -16,7 +16,7 @@ namespace GenerateExcelLib
         
     }
 
-    public class MergeCell
+    public class MergeCell : IComparable<MergeCell>
     {
         public int StartRow { get; set; }
         public int StartColumn { get; set; }
@@ -25,9 +25,9 @@ namespace GenerateExcelLib
 
         public MergeCell(int startRow, int startColumn, int totalRows, int totalColumns)
         {
-            if (startRow == 0 || startColumn == 0 || totalRows == 0 || totalColumns == 0)
+            if (startRow < 0 || startColumn < 0 || totalRows < 0 || totalColumns < 0)
             {
-                throw new ArgumentOutOfRangeException("These is zero parameter.");
+                throw new ArgumentOutOfRangeException("These is negative paramete.");
             }
             this.StartRow = startRow;
             this.StartColumn = startColumn;
@@ -37,12 +37,24 @@ namespace GenerateExcelLib
 
         public void AddOffSet(int offSetRows, int offSetColumns)
         {
-            if (this.StartRow + offSetRows <= 0 || this.StartColumn + offSetColumns <= 0)
+            if (this.StartRow + offSetRows < 0 || this.StartColumn + offSetColumns < 0)
             {
-                throw new ArgumentOutOfRangeException("The start row or start column is equal or less than zero.");
+                throw new ArgumentOutOfRangeException("The start row or start column is less than zero after added offset.");
             }
             this.StartRow += offSetRows;
             this.StartColumn += offSetColumns;
+        }
+
+        public int CompareTo(MergeCell mergeCell)
+        {
+            if (this.StartRow == mergeCell.StartRow &&
+                this.StartColumn == mergeCell.StartColumn &&
+                this.TotalRows == mergeCell.TotalRows &&
+                this.TotalColumns == mergeCell.TotalColumns)
+            {
+                return 0;
+            }
+            return 1;
         }
     }
 

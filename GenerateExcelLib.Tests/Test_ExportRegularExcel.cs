@@ -429,7 +429,7 @@ namespace GenerateExcelLib.Tests
                     var parameter=new DrawParameter{
                         StartCol=1,StartRow=1,
                         MergeCells=new Dictionary<string, MergeCell>{
-                            {"1-0",new MergeCell(1,1,1,2)}
+                            {"1-0",new MergeCell(1,1,2,1)}
                         }
                     } ;
                     //Act: run test function
@@ -463,7 +463,7 @@ namespace GenerateExcelLib.Tests
                     work_book.DrawExcel(mydata,parameter,false);
                     work_book.Save();
                     //Assert: result
-                    var result=Excel_Ops_Aspose.Is_MergeCell(ms,2,2,1,2);
+                    var result=Excel_Ops_Aspose.Is_MergeCell(ms,2,2,2,1);
                     Assert.True(result); //assert the spicified area is merged.
 
                 } 
@@ -484,7 +484,7 @@ namespace GenerateExcelLib.Tests
                     var parameter=new DrawParameter{
                         StartCol=1,StartRow=1,
                         MergeCells=new Dictionary<string, MergeCell>{
-                            {"1-0",new MergeCell(1,1,1,2)}
+                            {"1-0",new MergeCell(1,1,2,1)}
                         }
                     } ;
                     //Act: run test function
@@ -493,8 +493,8 @@ namespace GenerateExcelLib.Tests
                     #region  DataTable 2
                     var parameter2=new DrawParameter{
                         MergeCells=new Dictionary<string, MergeCell>{
-                            {"0-0",new MergeCell(0,0,1,2)},
-                            {"2-1",new MergeCell(2,1,1,2)}
+                            {"0-0",new MergeCell(0,0,2,1)},
+                            {"2-1",new MergeCell(1,2,2,1)}
                         }
                     } ;
                     //Act: run test function
@@ -525,7 +525,7 @@ namespace GenerateExcelLib.Tests
                     var parameter=new DrawParameter{
                         StartCol=1,StartRow=1,
                         MergeCells=new Dictionary<string, MergeCell>{
-                            {"1-0",new MergeCell(1,1,1,2)}
+                            {"1-0",new MergeCell(1,1,2,1)}
                         }
                     } ;
                     //Act: run test function
@@ -534,7 +534,7 @@ namespace GenerateExcelLib.Tests
                     #region  DataTable 2
                     var parameter2=new DrawParameter{
                         MergeCells=new Dictionary<string, MergeCell>{
-                            {"1-0",new MergeCell(1,1,1,2)}
+                            {"1-0",new MergeCell(1,1,2,1)}
                         }
                     } ;
                     //Act: run test function

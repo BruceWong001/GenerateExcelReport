@@ -131,9 +131,9 @@ namespace GenerateExcelLib.Tests
                 var mergeCells=designer.MergeCells;
                 // Then
                 Assert.Equal(2,mergeCells.Count);
-                Assert.Equal(new MergeCell(2,0,1,2),mergeCells["2-0"]);
+                Assert.Equal(new MergeCell(0,2,2,1),mergeCells["2-0"]);
 
-                Assert.Equal(new MergeCell(3,0,1,2),mergeCells["3-0"]);
+                Assert.Equal(new MergeCell(0,3,2,1),mergeCells["3-0"]);
             }
         }    
         class ListEnd
@@ -207,14 +207,14 @@ namespace GenerateExcelLib.Tests
                 // Then
                 Assert.Equal(5,mergeCells.Count);
 
-                Assert.Equal(new MergeCell(0,0,1,4),mergeCells["0-0"]);
+                Assert.Equal(new MergeCell(0,0,4,1),mergeCells["0-0"]);
 
-                Assert.Equal(new MergeCell(1,0,1,4),mergeCells["1-0"]);   
+                Assert.Equal(new MergeCell(0,1,4,1),mergeCells["1-0"]);   
                 
-                Assert.Equal(new MergeCell(2,0,1,4),mergeCells["2-0"]);
+                Assert.Equal(new MergeCell(0,2,4,1),mergeCells["2-0"]);
 
-                Assert.Equal(new MergeCell(3,1,1,2),mergeCells["3-1"]);
-                Assert.Equal(new MergeCell(6,1,1,2),mergeCells["6-1"]);
+                Assert.Equal(new MergeCell(1,3,2,1),mergeCells["3-1"]);
+                Assert.Equal(new MergeCell(1,6,2,1),mergeCells["6-1"]);
             }
         }
         class ListMiddle
@@ -314,12 +314,12 @@ namespace GenerateExcelLib.Tests
                 var mergeCells=designer.MergeCells;
             // Then
                 Assert.Equal<int>(6, mergeCells.Count);                
-                Assert.Equal(new MergeCell(0,0,1,5),mergeCells["0-0"]);
-                Assert.Equal(new MergeCell(1,0,1,5),mergeCells["1-0"]);
-                Assert.Equal(new MergeCell(2,0,1,2),mergeCells["2-0"]);
-                Assert.Equal(new MergeCell(2,2,1,2),mergeCells["2-2"]);
-                Assert.Equal(new MergeCell(5,0,1,5),mergeCells["5-0"]);
-                Assert.Equal(new MergeCell(6,0,1,5),mergeCells["6-0"]);
+                Assert.Equal(new MergeCell(0,0,5,1),mergeCells["0-0"]);
+                Assert.Equal(new MergeCell(0,1,5,1),mergeCells["1-0"]);
+                Assert.Equal(new MergeCell(0,2,2,1),mergeCells["2-0"]);
+                Assert.Equal(new MergeCell(2,2,2,1),mergeCells["2-2"]);
+                Assert.Equal(new MergeCell(0,5,5,1),mergeCells["5-0"]);
+                Assert.Equal(new MergeCell(0,6,5,1),mergeCells["6-0"]);
             }
 
         } 
@@ -406,11 +406,11 @@ namespace GenerateExcelLib.Tests
                 Dictionary<string, MergeCell> mergeCells=designer.MergeCells;
                 // Then
                 Assert.Equal<int>(5,mergeCells.Count);
-                Assert.Equal(new (0,0,1,3),mergeCells["0-0"]);
-                Assert.Equal(new (1,0,1,3),mergeCells["1-0"]);
-                Assert.Equal(new (2,0,1,3),mergeCells["2-0"]);
-                Assert.Equal(new (3,0,1,2),mergeCells["3-0"]);
-                Assert.Equal(new (5,1,1,2),mergeCells["5-1"]);
+                Assert.Equal(new (0,0,3,1),mergeCells["0-0"]);
+                Assert.Equal(new (0,1,3,1),mergeCells["1-0"]);
+                Assert.Equal(new (0,2,3,1),mergeCells["2-0"]);
+                Assert.Equal(new (0,3,2,1),mergeCells["3-0"]);
+                Assert.Equal(new (1,5,2,1),mergeCells["5-1"]);
                 
             }
 
@@ -434,11 +434,11 @@ namespace GenerateExcelLib.Tests
                 Dictionary<string, MergeCell> mergeCells=designer.MergeCells;
                 // Then
                 Assert.Equal<int>(5,mergeCells.Count);
-                Assert.Equal(new MergeCell(0,0,1,5),mergeCells["0-0"]);
-                Assert.Equal(new MergeCell(1,0,1,5),mergeCells["1-0"]);
-                Assert.Equal(new MergeCell(2,0,1,5),mergeCells["2-0"]);
-                Assert.Equal(new MergeCell(3,0,1,2),mergeCells["3-0"]);
-                Assert.Equal(new MergeCell(3,2,1,2),mergeCells["3-2"]);
+                Assert.Equal(new MergeCell(0,0,5,1),mergeCells["0-0"]);
+                Assert.Equal(new MergeCell(0,1,5,1),mergeCells["1-0"]);
+                Assert.Equal(new MergeCell(0,2,5,1),mergeCells["2-0"]);
+                Assert.Equal(new MergeCell(0,3,2,1),mergeCells["3-0"]);
+                Assert.Equal(new MergeCell(2,3,2,1),mergeCells["3-2"]);
 
             }
 
@@ -471,13 +471,13 @@ namespace GenerateExcelLib.Tests
                 Dictionary<string, MergeCell> mergeCells=designer.MergeCells;
                 // Then
                 Assert.Equal<int>(7,mergeCells.Count);
-                Assert.Equal(new MergeCell(0,0,1,4),mergeCells["0-0"]);
-                Assert.Equal(new MergeCell(1,0,1,4),mergeCells["1-0"]);
-                Assert.Equal(new MergeCell(2,1,1,2),mergeCells["2-1"]);
-                Assert.Equal(new MergeCell(3,0,1,2),mergeCells["3-0"]);
-                Assert.Equal(new MergeCell(3,2,1,2),mergeCells["3-2"]);
-                Assert.Equal(new MergeCell(4,0,1,2),mergeCells["4-0"]);
-                Assert.Equal(new MergeCell(4,2,1,2),mergeCells["4-2"]);
+                Assert.Equal(new MergeCell(0,0,4,1),mergeCells["0-0"]);
+                Assert.Equal(new MergeCell(0,1,4,1),mergeCells["1-0"]);
+                Assert.Equal(new MergeCell(1,2,2,1),mergeCells["2-1"]);
+                Assert.Equal(new MergeCell(0,3,2,1),mergeCells["3-0"]);
+                Assert.Equal(new MergeCell(2,3,2,1),mergeCells["3-2"]);
+                Assert.Equal(new MergeCell(0,4,2,1),mergeCells["4-0"]);
+                Assert.Equal(new MergeCell(2,4,2,1),mergeCells["4-2"]);
             }
 
         }
