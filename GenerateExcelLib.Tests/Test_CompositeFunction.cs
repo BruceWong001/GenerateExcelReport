@@ -79,7 +79,7 @@ namespace GenerateExcelLib.Tests
                 //generate datatable
                 using(DataTable mydata=designer.GeneratDataTable())
                 {
-                    using FileStream ms=new FileStream(@"c:\testnew.xlsx",FileMode.Create);
+                    using FileStream ms=new FileStream(@".\testnew.xlsx",FileMode.Create);
                     //using MemoryStream ms=new MemoryStream();
                     ExportRegularExcel work_book=new ExportRegularExcel(ms);
                     DrawParameter parameter=new DrawParameter{

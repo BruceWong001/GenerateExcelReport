@@ -78,8 +78,9 @@ namespace GenerateExcelLib
                 {
                     foreach(var mergedCell in m_DrawParameter.MergeCells.Values)
                     {
-                        cells.Merge(StartRowNum+rowOffset+mergedCell.Item2,StartColNum+mergedCell.Item1,
-                                    mergedCell.Item4,mergedCell.Item3);
+
+                        cells.Merge(StartRowNum+rowOffset+mergedCell.StartRow,StartColNum+mergedCell.StartColumn,
+                                    mergedCell.TotalRows,mergedCell.TotalColumns);
                     }
                 }
             }

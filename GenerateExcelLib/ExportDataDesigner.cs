@@ -16,9 +16,8 @@ namespace GenerateExcelLib
     {
         // final designed data table. all columns and rows will reuse this object. 
         private DataTable m_DT=new DataTable(); 
-        // item's order in Tuple are first Col, first Row,total Cols, total Rows
         // the format of key is 'start_ColIndex-start_RowIndex' when drill down current Data, since the merge should happen on same level and same value on same column.
-        private Dictionary<string,Tuple<int,int,int,int>> m_MergeCells=new Dictionary<string,Tuple<int, int, int, int>>();
+        private Dictionary<string, MergeCell> m_MergeCells=new Dictionary<string, MergeCell>();
         //The data which need to conver to DataTable, it's a generic type, you can define by yourself,
         //if you have array or collection type property in your data definition, please use List<T>. 
         private T Data;
@@ -30,7 +29,7 @@ namespace GenerateExcelLib
         private const string COlEXTENSION_Name="MergeIdentifier";
         private List<int> m_HiddenCols=new List<int>();
 
-        public Dictionary<string,Tuple<int,int,int,int>> MergeCells{get{
+        public Dictionary<string, MergeCell> MergeCells{get{
             return m_MergeCells;
         }}
         public List<int> HiddenCols{
@@ -180,11 +179,11 @@ namespace GenerateExcelLib
                 string key = $"{colIndex}-{ret.Item1}";
                 if (m_MergeCells.ContainsKey(key))
                 {
-                    m_MergeCells[key] = new Tuple<int, int, int, int>(colIndex, ret.Item1, 1, ret.Item2);
+                    m_MergeCells[key] = new MergeCell(ret.Item1, colIndex, ret.Item2, 1);
                 }
                 else
                 {
-                    m_MergeCells.Add(key, new Tuple<int, int, int, int>(colIndex, ret.Item1, 1, ret.Item2));
+                    m_MergeCells.Add(key, new MergeCell(ret.Item1, colIndex, ret.Item2, 1));
                 }
             }
         }
