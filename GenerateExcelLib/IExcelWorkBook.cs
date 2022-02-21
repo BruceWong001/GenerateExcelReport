@@ -11,10 +11,41 @@ namespace GenerateExcelLib
     {
         public int StartRow{get;set;}
         public int StartCol{get;set;}
-        public Dictionary<string,Tuple<int,int,int,int>> MergeCells{get;set;}
+        public Dictionary<string, MergeCell> MergeCells{get;set;}
         public List<int> HiddenColumns{get;set;}
         
     }
+
+    public class MergeCell
+    {
+        public int StartRow { get; set; }
+        public int StartColumn { get; set; }
+        public int TotalRows { get; set; }
+        public int TotalColumns { get; set; }
+
+        public MergeCell(int startRow, int startColumn, int totalRows, int totalColumns)
+        {
+            if (startRow == 0 || startColumn == 0 || totalRows == 0 || totalColumns == 0)
+            {
+                throw new ArgumentOutOfRangeException("These is zero parameter.");
+            }
+            this.StartRow = startRow;
+            this.StartColumn = startColumn;
+            this.TotalRows = totalRows;
+            this.TotalColumns = totalColumns;
+        }
+
+        public void AddOffSet(int offSetRows, int offSetColumns)
+        {
+            if (this.StartRow + offSetRows <= 0 || this.StartColumn + offSetColumns <= 0)
+            {
+                throw new ArgumentOutOfRangeException("The start row or start column is equal or less than zero.");
+            }
+            this.StartRow += offSetRows;
+            this.StartColumn += offSetColumns;
+        }
+    }
+
     ///
     /// this interface is for extracting the common behaivors which is for drawing a phyasical excel file.
     ///

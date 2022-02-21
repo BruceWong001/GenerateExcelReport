@@ -131,9 +131,9 @@ namespace GenerateExcelLib.Tests
                 var mergeCells=designer.MergeCells;
                 // Then
                 Assert.Equal(2,mergeCells.Count);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(2,0,1,2),mergeCells["2-0"]);
+                Assert.Equal(new MergeCell(2,0,1,2),mergeCells["2-0"]);
 
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(3,0,1,2),mergeCells["3-0"]);
+                Assert.Equal(new MergeCell(3,0,1,2),mergeCells["3-0"]);
             }
         }    
         class ListEnd
@@ -207,14 +207,14 @@ namespace GenerateExcelLib.Tests
                 // Then
                 Assert.Equal(5,mergeCells.Count);
 
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(0,0,1,4),mergeCells["0-0"]);
+                Assert.Equal(new MergeCell(0,0,1,4),mergeCells["0-0"]);
 
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(1,0,1,4),mergeCells["1-0"]);   
+                Assert.Equal(new MergeCell(1,0,1,4),mergeCells["1-0"]);   
                 
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(2,0,1,4),mergeCells["2-0"]);
+                Assert.Equal(new MergeCell(2,0,1,4),mergeCells["2-0"]);
 
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(3,1,1,2),mergeCells["3-1"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int, int, int, int>(6,1,1,2),mergeCells["6-1"]);
+                Assert.Equal(new MergeCell(3,1,1,2),mergeCells["3-1"]);
+                Assert.Equal(new MergeCell(6,1,1,2),mergeCells["6-1"]);
             }
         }
         class ListMiddle
@@ -314,12 +314,12 @@ namespace GenerateExcelLib.Tests
                 var mergeCells=designer.MergeCells;
             // Then
                 Assert.Equal<int>(6, mergeCells.Count);                
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(0,0,1,5),mergeCells["0-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(1,0,1,5),mergeCells["1-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(2,0,1,2),mergeCells["2-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(2,2,1,2),mergeCells["2-2"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(5,0,1,5),mergeCells["5-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(6,0,1,5),mergeCells["6-0"]);
+                Assert.Equal(new MergeCell(0,0,1,5),mergeCells["0-0"]);
+                Assert.Equal(new MergeCell(1,0,1,5),mergeCells["1-0"]);
+                Assert.Equal(new MergeCell(2,0,1,2),mergeCells["2-0"]);
+                Assert.Equal(new MergeCell(2,2,1,2),mergeCells["2-2"]);
+                Assert.Equal(new MergeCell(5,0,1,5),mergeCells["5-0"]);
+                Assert.Equal(new MergeCell(6,0,1,5),mergeCells["6-0"]);
             }
 
         } 
@@ -403,14 +403,14 @@ namespace GenerateExcelLib.Tests
             using(var designer=new ExportDataDesigner<ComprehensiveObj>(data))
             {
                 DataTable table=designer.GeneratDataTable();
-                Dictionary<string,Tuple<int,int,int,int>> mergeCells=designer.MergeCells;
+                Dictionary<string, MergeCell> mergeCells=designer.MergeCells;
                 // Then
                 Assert.Equal<int>(5,mergeCells.Count);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(0,0,1,3),mergeCells["0-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(1,0,1,3),mergeCells["1-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(2,0,1,3),mergeCells["2-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(3,0,1,2),mergeCells["3-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(5,1,1,2),mergeCells["5-1"]);
+                Assert.Equal(new (0,0,1,3),mergeCells["0-0"]);
+                Assert.Equal(new (1,0,1,3),mergeCells["1-0"]);
+                Assert.Equal(new (2,0,1,3),mergeCells["2-0"]);
+                Assert.Equal(new (3,0,1,2),mergeCells["3-0"]);
+                Assert.Equal(new (5,1,1,2),mergeCells["5-1"]);
                 
             }
 
@@ -431,14 +431,14 @@ namespace GenerateExcelLib.Tests
             using(var designer=new ExportDataDesigner<ComprehensiveObj>(data))
             {
                 DataTable table=designer.GeneratDataTable();
-                Dictionary<string,Tuple<int,int,int,int>> mergeCells=designer.MergeCells;
+                Dictionary<string, MergeCell> mergeCells=designer.MergeCells;
                 // Then
                 Assert.Equal<int>(5,mergeCells.Count);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(0,0,1,5),mergeCells["0-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(1,0,1,5),mergeCells["1-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(2,0,1,5),mergeCells["2-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(3,0,1,2),mergeCells["3-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(3,2,1,2),mergeCells["3-2"]);
+                Assert.Equal(new MergeCell(0,0,1,5),mergeCells["0-0"]);
+                Assert.Equal(new MergeCell(1,0,1,5),mergeCells["1-0"]);
+                Assert.Equal(new MergeCell(2,0,1,5),mergeCells["2-0"]);
+                Assert.Equal(new MergeCell(3,0,1,2),mergeCells["3-0"]);
+                Assert.Equal(new MergeCell(3,2,1,2),mergeCells["3-2"]);
 
             }
 
@@ -468,16 +468,16 @@ namespace GenerateExcelLib.Tests
             using(var designer=new ExportDataDesigner<ClassInfo>(data))
             {
                 DataTable table=designer.GeneratDataTable();
-                Dictionary<string,Tuple<int,int,int,int>> mergeCells=designer.MergeCells;
+                Dictionary<string, MergeCell> mergeCells=designer.MergeCells;
                 // Then
                 Assert.Equal<int>(7,mergeCells.Count);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(0,0,1,4),mergeCells["0-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(1,0,1,4),mergeCells["1-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(2,1,1,2),mergeCells["2-1"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(3,0,1,2),mergeCells["3-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(3,2,1,2),mergeCells["3-2"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(4,0,1,2),mergeCells["4-0"]);
-                Assert.Equal<Tuple<int,int,int,int>>(new Tuple<int,int,int,int>(4,2,1,2),mergeCells["4-2"]);
+                Assert.Equal(new MergeCell(0,0,1,4),mergeCells["0-0"]);
+                Assert.Equal(new MergeCell(1,0,1,4),mergeCells["1-0"]);
+                Assert.Equal(new MergeCell(2,1,1,2),mergeCells["2-1"]);
+                Assert.Equal(new MergeCell(3,0,1,2),mergeCells["3-0"]);
+                Assert.Equal(new MergeCell(3,2,1,2),mergeCells["3-2"]);
+                Assert.Equal(new MergeCell(4,0,1,2),mergeCells["4-0"]);
+                Assert.Equal(new MergeCell(4,2,1,2),mergeCells["4-2"]);
             }
 
         }
@@ -498,7 +498,7 @@ namespace GenerateExcelLib.Tests
             using(var designer=new ExportDataDesigner<ClassInfo>(data))
             {
                 DataTable table=designer.GeneratDataTable();
-                Dictionary<string,Tuple<int,int,int,int>> mergeCells=designer.MergeCells;
+                Dictionary<string, MergeCell> mergeCells=designer.MergeCells;
                 // Then
                 Assert.Equal(3,designer.HiddenCols[0]);
                 Assert.Equal(1,designer.HiddenCols.Count);
